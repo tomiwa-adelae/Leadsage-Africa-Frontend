@@ -9,7 +9,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 const data = [
   { month: "Nov", revenue: 1800000 },
@@ -35,8 +41,15 @@ export function RevenueChart() {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={data} margin={{ top: 4, right: 4, left: -8, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+          <BarChart
+            data={data}
+            margin={{ top: 4, right: 4, left: -8, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="hsl(var(--border))"
+              vertical={false}
+            />
             <XAxis
               dataKey="month"
               tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
@@ -50,13 +63,15 @@ export function RevenueChart() {
               tickLine={false}
             />
             <Tooltip
-              formatter={(value: number) =>
-                new Intl.NumberFormat("en-NG", {
+              formatter={(value) => {
+                if (value == null) return ""
+
+                return new Intl.NumberFormat("en-NG", {
                   style: "currency",
                   currency: "NGN",
                   maximumFractionDigits: 0,
-                }).format(value)
-              }
+                }).format(Number(value))
+              }}
               contentStyle={{
                 background: "hsl(var(--card))",
                 border: "1px solid hsl(var(--border))",

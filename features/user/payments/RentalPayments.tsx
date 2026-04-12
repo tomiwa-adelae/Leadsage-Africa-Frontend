@@ -10,13 +10,22 @@ import {
   IconCircleCheck,
   IconClockHour4,
   IconAlertCircle,
+  IconCreditCard,
+  IconWallet,
+  IconChevronDown,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { fetchData } from "@/lib/api"
+import { fetchData, postData } from "@/lib/api"
 import { PageHeader } from "@/components/PageHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -88,18 +97,55 @@ const fmt = (n: number) =>
 export function RentalPayments() {
   const [payments, setPayments] = useState<RentalPayment[]>([])
   const [loading, setLoading] = useState(true)
+  const [paying, setPaying] = useState<string | null>(null)
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await fetchData<RentalPayment[]>("/user/rental-payments")
+      const [data, wallet] = await Promise.all([
+        fetchData<RentalPayment[]>("/user/rental-payments"),
+        fetchData<{ availableBalance: number }>("/wallet").catch(() => null),
+      ])
       setPayments(data)
+      if (wallet) setWalletBalance(wallet.availableBalance)
     } catch {
       toast.error("Failed to load payments")
     } finally {
       setLoading(false)
     }
   }, [])
+
+  async function handlePayCard(paymentId: string) {
+    setPaying(paymentId)
+    try {
+      const { paymentUrl } = await postData<{ paymentUrl: string; reference: string }>(
+        `/user/rental-payments/${paymentId}/pay`,
+        {}
+      )
+      window.location.href = paymentUrl
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to initialize payment")
+      setPaying(null)
+    }
+  }
+
+  async function handlePayWallet(paymentId: string, amount: number) {
+    if (walletBalance !== null && walletBalance < amount) {
+      toast.error(`Insufficient wallet balance. You have ${fmt(walletBalance)}.`)
+      return
+    }
+    setPaying(paymentId)
+    try {
+      await postData(`/wallet/pay/rent/${paymentId}`, {})
+      toast.success("Paid from wallet — funds held in escrow for landlord")
+      load()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Wallet payment failed")
+    } finally {
+      setPaying(null)
+    }
+  }
 
   useEffect(() => {
     load()
@@ -234,6 +280,43 @@ export function RentalPayments() {
                             <Icon className="size-3" />
                             {cfg.label}
                           </span>
+                          {(p.status === "PENDING" || p.status === "OVERDUE") && (
+                            paying === p.id ? (
+                              <Button size="sm" disabled>
+                                <IconLoader2 className="size-3.5 animate-spin" />
+                                Processing…
+                              </Button>
+                            ) : (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button size="sm">
+                                    Pay now
+                                    <IconChevronDown className="size-3.5" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handlePayCard(p.id)}>
+                                    <IconCreditCard className="size-4" />
+                                    Pay with Card
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handlePayWallet(p.id, p.amount)}
+                                    disabled={walletBalance !== null && walletBalance < p.amount}
+                                  >
+                                    <IconWallet className="size-4" />
+                                    <span>
+                                      Pay with Wallet
+                                      {walletBalance !== null && (
+                                        <span className="ml-1 text-xs text-muted-foreground">
+                                          ({fmt(walletBalance)})
+                                        </span>
+                                      )}
+                                    </span>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )
+                          )}
                         </div>
                       </div>
                     )

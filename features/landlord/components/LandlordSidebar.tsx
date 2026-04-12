@@ -18,6 +18,7 @@ import {
   IconLogout,
   IconUser,
   IconHomeDot,
+  IconWallet,
 } from "@tabler/icons-react"
 
 import {
@@ -74,6 +75,7 @@ const mainLinks = [
 ]
 
 const bottomLinks = [
+  { label: "Wallet", href: "/landlord/wallet", icon: IconWallet },
   { label: "Earnings", href: "/landlord/earnings", icon: IconCurrencyNaira },
   { label: "Messages", href: "/landlord/messages", icon: IconMessage },
   { label: "Notifications", href: "/landlord/notifications", icon: IconBell },

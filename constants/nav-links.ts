@@ -13,6 +13,7 @@ import {
   IconFileText,
   IconCurrencyNaira,
   IconClipboardCheck,
+  IconWallet,
 } from "@tabler/icons-react"
 
 // ── Tenant / CLIENT nav ────────────────────────────────────────────────────────
@@ -52,6 +53,11 @@ export const clientNavLinks = [
     label: "Rental Payments",
     slug: "/rental-payments",
     icon: IconCurrencyNaira,
+  },
+  {
+    label: "Wallet",
+    slug: "/wallet",
+    icon: IconWallet,
   },
   {
     label: "Notifications",

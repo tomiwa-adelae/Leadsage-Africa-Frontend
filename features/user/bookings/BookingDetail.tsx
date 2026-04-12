@@ -24,10 +24,13 @@ import {
   IconCheck,
   IconLock,
   IconInfoCircle,
+  IconCreditCard,
+  IconWallet,
+  IconChevronDown,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { fetchData, deleteData } from "@/lib/api"
+import { fetchData, deleteData, postData } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -42,6 +45,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { PageHeader } from "@/components/PageHeader"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -182,18 +191,60 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
   const [loading, setLoading] = useState(true)
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelling, setCancelling] = useState(false)
+  const [paying, setPaying] = useState(false)
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await fetchData<Booking>(`/user/bookings/${bookingId}`)
+      const [data, wallet] = await Promise.all([
+        fetchData<Booking>(`/user/bookings/${bookingId}`),
+        fetchData<{ availableBalance: number }>("/wallet").catch(() => null),
+      ])
       setBooking(data)
+      if (wallet) setWalletBalance(wallet.availableBalance)
     } catch {
       toast.error("Failed to load booking")
     } finally {
       setLoading(false)
     }
   }, [bookingId])
+
+  async function handlePayCard() {
+    setPaying(true)
+    try {
+      const { paymentUrl } = await postData<{ paymentUrl: string }>(
+        `/user/bookings/${bookingId}/pay`,
+        {}
+      )
+      window.location.href = paymentUrl
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to initialize payment")
+      setPaying(false)
+    }
+  }
+
+  async function handlePayWallet() {
+    if (!booking) return
+    if (walletBalance !== null && walletBalance < booking.totalPrice) {
+      toast.error(`Insufficient wallet balance. You have ${fmt(walletBalance)}.`)
+      return
+    }
+    setPaying(true)
+    try {
+      const res = await postData<{ status: string }>(`/wallet/pay/booking/${bookingId}`, {})
+      toast.success(
+        res.status === "CONFIRMED"
+          ? "Paid and booking confirmed!"
+          : "Paid — awaiting host confirmation"
+      )
+      load()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Wallet payment failed")
+    } finally {
+      setPaying(false)
+    }
+  }
 
   useEffect(() => {
     load()
@@ -245,6 +296,7 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
     label: booking.status,
   }
   const canCancel = ["PENDING", "CONFIRMED"].includes(booking.status)
+  const needsPayment = booking.paymentStatus === "UNPAID"
   const hasInstructions = !!booking.instructionsPublishedAt
 
   // Collect which instruction sections have data
@@ -535,6 +587,55 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
           )}
         </div>
       </div>
+
+      {/* Payment prompt for unpaid bookings */}
+      {needsPayment && (
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900 dark:bg-amber-950/30">
+          <div>
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+              Payment required
+            </p>
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              Complete payment to confirm your booking — {fmt(booking.totalPrice)}
+            </p>
+          </div>
+          {paying ? (
+            <Button size="sm" disabled>
+              <IconLoader2 className="size-4 animate-spin" />
+              Processing…
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm">
+                  Pay now
+                  <IconChevronDown className="size-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handlePayCard}>
+                  <IconCreditCard className="size-4" />
+                  Pay with Card
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handlePayWallet}
+                  disabled={walletBalance !== null && walletBalance < booking.totalPrice}
+                >
+                  <IconWallet className="size-4" />
+                  <span>
+                    Pay with Wallet
+                    {walletBalance !== null && (
+                      <span className="ml-1 text-xs text-muted-foreground">
+                        ({fmt(walletBalance)})
+                      </span>
+                    )}
+                  </span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      )}
 
       {/* Actions */}
       {canCancel && (

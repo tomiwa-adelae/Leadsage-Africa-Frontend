@@ -73,6 +73,10 @@ const statusConfig: Record<
     label: "Archived",
     className: "bg-muted text-muted-foreground border-transparent",
   },
+  OCCUPIED: {
+    label: "Occupied",
+    className: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
+  },
 }
 
 const typeLabels: Record<BackendListingType, string> = {
@@ -85,6 +89,7 @@ const typeLabels: Record<BackendListingType, string> = {
 const tabFilters: { label: string; value: BackendListingStatus | "ALL" }[] = [
   { label: "All", value: "ALL" },
   { label: "Published", value: "PUBLISHED" },
+  { label: "Occupied", value: "OCCUPIED" },
   { label: "Draft", value: "DRAFT" },
   { label: "Pending Review", value: "PENDING_REVIEW" },
   { label: "Rejected", value: "REJECTED" },
@@ -121,6 +126,22 @@ export function ListingsTable() {
   const [activeTab, setActiveTab] = useState<BackendListingStatus | "ALL">("ALL")
   const [dismissedBanners, setDismissedBanners] = useState<BackendListingStatus[]>([])
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [markingAvailableId, setMarkingAvailableId] = useState<string | null>(null)
+
+  async function handleMarkAvailable(listingId: string) {
+    setMarkingAvailableId(listingId)
+    try {
+      await updateData(`/landlord/listings/${listingId}/mark-available`, {})
+      setListings((prev) =>
+        prev.map((l) => (l.id === listingId ? { ...l, status: "PUBLISHED" as const } : l))
+      )
+      toast.success("Listing marked as available and re-published")
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to update listing")
+    } finally {
+      setMarkingAvailableId(null)
+    }
+  }
 
   async function handleToggleInstantBook(listingId: string) {
     setTogglingId(listingId)
@@ -347,6 +368,11 @@ export function ListingsTable() {
                               Under review
                             </p>
                           )}
+                          {listing.status === "OCCUPIED" && (
+                            <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
+                              Currently occupied
+                            </p>
+                          )}
                         </div>
                       </div>
                     </TableCell>
@@ -419,6 +445,22 @@ export function ListingsTable() {
                                 </DropdownMenuItem>
                               </>
                             )}
+                          {listing.status === "OCCUPIED" && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleMarkAvailable(listing.id)}
+                                disabled={markingAvailableId === listing.id}
+                              >
+                                {markingAvailableId === listing.id ? (
+                                  <IconLoader2 className="size-4 animate-spin" />
+                                ) : (
+                                  <IconBolt className="size-4" />
+                                )}
+                                Mark as Available
+                              </DropdownMenuItem>
+                            </>
+                          )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem>
                             <IconArchive className="size-4" /> Archive

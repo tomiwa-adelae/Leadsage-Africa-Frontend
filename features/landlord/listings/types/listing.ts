@@ -4,6 +4,7 @@ export type BackendListingStatus =
   | "PUBLISHED"
   | "REJECTED"
   | "ARCHIVED"
+  | "OCCUPIED"
 
 export type BackendListingType =
   | "LONG_TERM"

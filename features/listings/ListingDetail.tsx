@@ -27,6 +27,8 @@ import {
   IconMoon,
   IconShieldCheck,
   IconHomeDot,
+  IconCreditCard,
+  IconWallet,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -62,6 +64,7 @@ interface PublicListing {
   description: string
   listingType: string
   propertyCategory: string
+  status: string
   state: string
   lga: string
   area: string
@@ -416,13 +419,15 @@ function BookDialog({
   open: boolean
   onClose: () => void
 }) {
+  const router = useRouter()
   const [range, setRange] = useState<DateRange | undefined>()
   const [guests, setGuests] = useState(1)
   const [requests, setRequests] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [bookedRanges, setBookedRanges] = useState<{ from: Date; to: Date }[]>([])
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
 
-  // Fetch booked dates when dialog opens
+  // Fetch booked dates + wallet balance when dialog opens
   useEffect(() => {
     if (!open) return
     publicFetch<{ from: string; to: string }[]>(
@@ -430,16 +435,15 @@ function BookDialog({
     )
       .then((data) => setBookedRanges(buildDisabledDates(data)))
       .catch(() => {})
+
+    fetchData<{ availableBalance: number }>("/wallet")
+      .then((w) => setWalletBalance(w.availableBalance))
+      .catch(() => setWalletBalance(null))
   }, [open, listing.id])
 
   const nights =
     range?.from && range?.to
-      ? Math.max(
-          0,
-          Math.round(
-            (range.to.getTime() - range.from.getTime()) / 86400000
-          )
-        )
+      ? Math.max(0, Math.round((range.to.getTime() - range.from.getTime()) / 86400000))
       : 0
 
   const total =
@@ -448,12 +452,12 @@ function BookDialog({
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const disabledDays = [
-    { before: today },
-    ...bookedRanges,
-  ]
+  const disabledDays = [{ before: today }, ...bookedRanges]
 
-  async function handleSubmit() {
+  const canUseWallet =
+    walletBalance !== null && total !== null && walletBalance >= total
+
+  async function handleBookAndPay(method: "card" | "wallet") {
     if (!range?.from || !range?.to) {
       toast.error("Please select your check-in and check-out dates")
       return
@@ -469,6 +473,7 @@ function BookDialog({
 
     setSubmitting(true)
     try {
+      // Step 1: create the booking
       const res = await postData<{ booking: any; paymentUrl: string }>(
         "/user/bookings",
         {
@@ -479,12 +484,29 @@ function BookDialog({
           specialRequests: requests.trim() || undefined,
         }
       )
-      toast.success("Redirecting to payment…")
+
+      if (method === "card") {
+        toast.success("Redirecting to payment…")
+        onClose()
+        window.location.href = res.paymentUrl
+        return
+      }
+
+      // Step 2 (wallet): pay immediately from wallet balance
+      const payRes = await postData<{ status: string }>(
+        `/wallet/pay/booking/${res.booking.id}`,
+        {}
+      )
+      toast.success(
+        payRes.status === "CONFIRMED"
+          ? "Booking confirmed and paid!"
+          : "Paid — awaiting host confirmation"
+      )
       onClose()
-      window.location.href = res.paymentUrl
+      router.push(`/bookings/${res.booking.id}`)
     } catch (err: any) {
       const msg = err?.response?.data?.message
-      toast.error(typeof msg === "string" ? msg : "Failed to submit booking")
+      toast.error(typeof msg === "string" ? msg : "Booking failed")
     } finally {
       setSubmitting(false)
     }
@@ -493,6 +515,8 @@ function BookDialog({
   const fmtShort = (d: Date) =>
     d.toLocaleDateString("en-NG", { day: "numeric", month: "short" })
 
+  const canSubmit = !submitting && !!range?.from && !!range?.to && nights > 0
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg p-0">
@@ -500,9 +524,7 @@ function BookDialog({
           <DialogTitle>Select your dates</DialogTitle>
           <DialogDescription>
             {listing.pricePerNight ? `${fmt(listing.pricePerNight)}/night` : ""}
-            {listing.minimumNights
-              ? ` · min. ${listing.minimumNights} nights`
-              : ""}
+            {listing.minimumNights ? ` · min. ${listing.minimumNights} nights` : ""}
           </DialogDescription>
         </DialogHeader>
 
@@ -530,9 +552,7 @@ function BookDialog({
               <div className="text-muted-foreground">→</div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground">Check-out</p>
-                <p className="font-medium">
-                  {range.to ? fmtShort(range.to) : "—"}
-                </p>
+                <p className="font-medium">{range.to ? fmtShort(range.to) : "—"}</p>
               </div>
               {nights > 0 && (
                 <div className="text-right">
@@ -587,17 +607,40 @@ function BookDialog({
           </div>
         </div>
 
-        <DialogFooter className="border-t px-5 py-4">
-          <Button variant="outline" onClick={onClose} disabled={submitting}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={submitting || !range?.from || !range?.to || nights <= 0}
-          >
-            {submitting && <IconLoader2 className="size-4 animate-spin" />}
-            {submitting ? "Preparing payment…" : nights > 0 ? `Book & Pay ${total ? fmt(total) : ""}` : "Book & Pay"}
-          </Button>
+        <DialogFooter className="flex-col gap-2 border-t px-5 py-4 sm:flex-col">
+          {submitting ? (
+            <Button disabled className="w-full">
+              <IconLoader2 className="size-4 animate-spin" />
+              Processing…
+            </Button>
+          ) : (
+            <div className="flex w-full flex-col gap-2">
+              <Button
+                className="w-full"
+                disabled={!canSubmit}
+                onClick={() => handleBookAndPay("card")}
+              >
+                <IconCreditCard className="size-4" />
+                {nights > 0 && total ? `Pay with Card — ${fmt(total)}` : "Pay with Card"}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={!canSubmit || !canUseWallet}
+                onClick={() => handleBookAndPay("wallet")}
+              >
+                <IconWallet className="size-4" />
+                {canUseWallet
+                  ? `Pay with Wallet — ${fmt(walletBalance!)} available`
+                  : walletBalance === null
+                    ? "Pay with Wallet"
+                    : `Insufficient wallet balance (${fmt(walletBalance ?? 0)})`}
+              </Button>
+              <Button variant="ghost" onClick={onClose} className="w-full">
+                Cancel
+              </Button>
+            </div>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -709,6 +752,7 @@ export function ListingDetail({ slug }: { slug: string }) {
 
   const isShortlet = ["SHORTLET", "HOTEL_ROOM"].includes(listing.listingType)
   const isLongTerm = ["LONG_TERM", "OFFICE_SPACE"].includes(listing.listingType)
+  const isOccupied = listing.status === "OCCUPIED"
   const landlordInitials =
     `${listing.landlord.firstName?.[0] ?? ""}${listing.landlord.lastName?.[0] ?? ""}`.toUpperCase()
   const landlordSince = new Date(listing.landlord.createdAt).getFullYear()
@@ -814,6 +858,11 @@ export function ListingDetail({ slug }: { slug: string }) {
                 <Badge variant="outline">
                   {listing.propertyCategory.replace(/_/g, " ")}
                 </Badge>
+                {isOccupied && (
+                  <Badge className="bg-slate-700 text-white hover:bg-slate-700">
+                    Occupied
+                  </Badge>
+                )}
                 <Badge variant="outline">
                   {FURNISHED_LABELS[listing.furnished] ?? listing.furnished}
                 </Badge>
@@ -1039,7 +1088,12 @@ export function ListingDetail({ slug }: { slug: string }) {
                 </div>
 
                 <div className="grid gap-2">
-                  {isLongTerm ? (
+                  {isOccupied ? (
+                    <div className="flex items-center justify-center gap-2 rounded-lg border border-muted bg-muted/40 px-4 py-3 text-sm font-medium text-muted-foreground">
+                      <IconShieldCheck className="size-4 shrink-0" />
+                      Currently occupied — not available
+                    </div>
+                  ) : isLongTerm ? (
                     <>
                       <Button
                         className="w-full"

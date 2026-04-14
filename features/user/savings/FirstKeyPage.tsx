@@ -223,14 +223,14 @@ export function FirstKeyPage() {
         back
         title="FirstKey Savings"
         description="Save toward your next home with 12% annual interest"
-        // action={
-        //   <Button asChild size="sm">
-        //     <Link href="/firstkey/new">
-        //       <IconPlus className="size-4" />
-        //       New Plan
-        //     </Link>
-        //   </Button>
-        // }
+        action={
+          <Button asChild size="sm">
+            <Link href="/firstkey/new">
+              <IconPlus className="size-4" />
+              New Plan
+            </Link>
+          </Button>
+        }
       />
 
       {plans.length === 0 ? (

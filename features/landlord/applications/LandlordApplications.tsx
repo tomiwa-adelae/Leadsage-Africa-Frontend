@@ -76,11 +76,12 @@ const fmt = (n: number) =>
   }).format(n)
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING:      "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  PENDING: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
   UNDER_REVIEW: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  APPROVED:     "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  REJECTED:     "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  WITHDRAWN:    "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400",
+  APPROVED:
+    "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+  REJECTED: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+  WITHDRAWN: "bg-zinc-100 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400",
 }
 
 // ── Respond Dialog ─────────────────────────────────────────────────────────────
@@ -107,7 +108,9 @@ function RespondDialog({
       await updateData(`/landlord/applications/${application.id}/${action}`, {
         note: note.trim() || undefined,
       })
-      toast.success(action === "approve" ? "Application approved!" : "Application rejected.")
+      toast.success(
+        action === "approve" ? "Application approved!" : "Application rejected."
+      )
       onSuccess()
       onClose()
     } catch (err: any) {
@@ -123,7 +126,9 @@ function RespondDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {action === "approve" ? "Approve application" : "Reject application"}
+            {action === "approve"
+              ? "Approve application"
+              : "Reject application"}
           </DialogTitle>
           <DialogDescription>
             {action === "approve"
@@ -143,7 +148,9 @@ function RespondDialog({
         <div className="space-y-1.5">
           <Label>
             Note to applicant{" "}
-            <span className="font-normal text-muted-foreground">(optional)</span>
+            <span className="font-normal text-muted-foreground">
+              (optional)
+            </span>
           </Label>
           <Textarea
             placeholder={
@@ -214,7 +221,12 @@ function ApplicationCard({
           {/* Listing thumbnail */}
           <div className="relative hidden size-20 flex-shrink-0 overflow-hidden rounded-lg sm:block">
             {photo ? (
-              <Image src={photo} alt={application.listing.title} fill className="object-cover" />
+              <Image
+                src={photo}
+                alt={application.listing.title}
+                fill
+                className="object-cover"
+              />
             ) : (
               <div className="flex h-full items-center justify-center bg-muted text-xs text-muted-foreground">
                 No photo
@@ -256,10 +268,12 @@ function ApplicationCard({
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="text-sm font-medium leading-none">
+                <p className="text-sm leading-none font-medium">
                   {applicant.firstName} {applicant.lastName}
                 </p>
-                <p className="text-xs text-muted-foreground">{applicant.email}</p>
+                <p className="text-xs text-muted-foreground">
+                  {applicant.email}
+                </p>
               </div>
               {applicant.phoneNumber && (
                 <a
@@ -278,11 +292,14 @@ function ApplicationCard({
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <IconCalendar className="size-3.5" />
                   Move-in:{" "}
-                  {new Date(application.moveInDate).toLocaleDateString("en-NG", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {new Date(application.moveInDate).toLocaleDateString(
+                    "en-NG",
+                    {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )}
                 </p>
               )}
               {application.message && (
@@ -368,7 +385,9 @@ export function LandlordApplications() {
     setLoading(true)
     try {
       const params = statusFilter !== "ALL" ? `?status=${statusFilter}` : ""
-      const data = await fetchData<Application[]>(`/landlord/applications${params}`)
+      const data = await fetchData<Application[]>(
+        `/landlord/applications${params}`
+      )
       setApplications(data)
     } catch {
       toast.error("Failed to load applications")
@@ -377,13 +396,16 @@ export function LandlordApplications() {
     }
   }, [statusFilter])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+  }, [load])
 
   const pendingCount = applications.filter((a) => a.status === "PENDING").length
 
   return (
     <div className="space-y-6">
       <PageHeader
+        back
         title="Applications"
         description="Rental applications across your long-term listings"
       />
@@ -404,7 +426,8 @@ export function LandlordApplications() {
           </SelectContent>
         </Select>
         <span className="text-sm text-muted-foreground">
-          {applications.length} application{applications.length !== 1 ? "s" : ""}
+          {applications.length} application
+          {applications.length !== 1 ? "s" : ""}
           {pendingCount > 0 && (
             <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
               {pendingCount} pending
@@ -420,7 +443,9 @@ export function LandlordApplications() {
         </div>
       ) : applications.length === 0 ? (
         <div className="flex h-40 flex-col items-center justify-center gap-2 text-center">
-          <p className="text-sm text-muted-foreground">No applications found.</p>
+          <p className="text-sm text-muted-foreground">
+            No applications found.
+          </p>
         </div>
       ) : (
         <div className="space-y-4">

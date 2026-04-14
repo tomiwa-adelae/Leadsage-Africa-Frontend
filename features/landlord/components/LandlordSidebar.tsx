@@ -96,9 +96,13 @@ export function LandlordSidebar() {
       <SidebarHeader className="border-b py-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent">
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              className="hover:bg-transparent active:bg-transparent"
+            >
               <Link href="/landlord/dashboard">
-                <Logo />
+                <Logo color="green" />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -136,7 +140,10 @@ export function LandlordSidebar() {
           <SidebarGroupLabel>Properties</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <Collapsible defaultOpen={isListingsOpen} className="group/collapsible">
+              <Collapsible
+                defaultOpen={isListingsOpen}
+                className="group/collapsible"
+              >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
@@ -231,7 +238,7 @@ export function LandlordSidebar() {
                 >
                   <Avatar className="size-8 rounded-lg">
                     <AvatarImage src="" alt="Landlord" />
-                    <AvatarFallback className="rounded-lg bg-primary text-primary-foreground text-xs font-semibold">
+                    <AvatarFallback className="rounded-lg bg-primary text-xs font-semibold text-primary-foreground">
                       LD
                     </AvatarFallback>
                   </Avatar>

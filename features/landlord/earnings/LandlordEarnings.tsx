@@ -146,12 +146,17 @@ export function LandlordEarnings() {
   const [data, setData] = useState<EarningsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"ALL" | "COMPLETED" | "CONFIRMED">("ALL")
+  const [hasWallet, setHasWallet] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetchData<EarningsData>("/landlord/earnings")
+      const [res, wallet] = await Promise.all([
+        fetchData<EarningsData>("/landlord/earnings"),
+        fetchData<{ availableBalance: number }>("/wallet").catch(() => null),
+      ])
       setData(res)
+      setHasWallet(wallet !== null)
     } catch {
       toast.error("Failed to load earnings")
     } finally {
@@ -202,14 +207,26 @@ export function LandlordEarnings() {
         </Button>
       </div>
 
-      {/* Wallet coming-soon banner */}
-      <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
-        <IconInfoCircle className="mt-0.5 size-4 flex-shrink-0" />
-        <p>
-          Wallet withdrawals are coming soon. Your earnings are held securely
-          and will be withdrawable once your wallet is set up.
-        </p>
-      </div>
+      {/* Wallet banner */}
+      {hasWallet ? (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300">
+          <div className="flex items-center gap-2">
+            <IconCircleCheck className="size-4 flex-shrink-0" />
+            <p>Your wallet is active. Released earnings are available for withdrawal.</p>
+          </div>
+          <Button size="sm" variant="outline" asChild className="shrink-0 border-emerald-300 text-emerald-800 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900">
+            <Link href="/landlord/wallet">Go to Wallet</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
+          <IconInfoCircle className="mt-0.5 size-4 flex-shrink-0" />
+          <p>
+            Wallet withdrawals are coming soon. Your earnings are held securely
+            and will be withdrawable once your wallet is set up.
+          </p>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">

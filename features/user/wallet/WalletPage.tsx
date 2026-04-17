@@ -370,7 +370,7 @@ export function WalletPage() {
             Transaction History
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-3">
+        <CardContent>
           {txs.length === 0 ? (
             <div className="flex h-32 flex-col items-center justify-center gap-2 text-center">
               <IconBuildingBank className="size-8 text-muted-foreground/40" />
@@ -558,7 +558,7 @@ export function WalletPage() {
                   }
                 />
                 <Button
-                  size="sm"
+                  // size="sm"
                   variant="outline"
                   onClick={handleVerifyBank}
                   disabled={

@@ -13,6 +13,7 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconArrowRight,
+  IconTrash,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -146,10 +147,29 @@ export function AdminScreeningDetail({ id }: { id: string }) {
   const [generatingAgreement, setGeneratingAgreement] = useState(false)
 
   // Payment form
-  const [payInstallments, setPayInstallments] = useState([
-    { amount: "", dueDate: "" },
-  ])
+  const [payInstallments, setPayInstallments] = useState<{ amount: string; dueDate: string }[]>([])
   const [creatingPayment, setCreatingPayment] = useState(false)
+
+  function openPaymentDialog() {
+    const agreement = app?.agreement
+    if (agreement?.startDate && agreement?.endDate && agreement?.monthlyRent) {
+      const start = new Date(agreement.startDate)
+      const end = new Date(agreement.endDate)
+      const generated: { amount: string; dueDate: string }[] = []
+      const current = new Date(start)
+      while (current <= end) {
+        generated.push({
+          amount: String(agreement.monthlyRent),
+          dueDate: current.toISOString().slice(0, 10),
+        })
+        current.setMonth(current.getMonth() + 1)
+      }
+      setPayInstallments(generated.length > 0 ? generated : [{ amount: "", dueDate: "" }])
+    } else {
+      setPayInstallments([{ amount: "", dueDate: "" }])
+    }
+    setShowPaymentDialog(true)
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -527,11 +547,7 @@ export function AdminScreeningDetail({ id }: { id: string }) {
           <div className="flex gap-2">
             {app.agreement.status === "FULLY_SIGNED" &&
               app.payments.length === 0 && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowPaymentDialog(true)}
-                >
+                <Button size="sm" variant="outline" onClick={openPaymentDialog}>
                   Create payments
                 </Button>
               )}
@@ -631,31 +647,45 @@ export function AdminScreeningDetail({ id }: { id: string }) {
           </DialogHeader>
           <div className="max-h-72 space-y-3 overflow-y-auto">
             {payInstallments.map((inst, i) => (
-              <div key={i} className="grid grid-cols-2 items-end gap-2">
-                <div className="space-y-1.5">
-                  <Label>Amount (₦) – installment {i + 1}</Label>
-                  <Input
-                    type="number"
-                    value={inst.amount}
-                    onChange={(e) => {
-                      const copy = [...payInstallments]
-                      copy[i] = { ...copy[i], amount: e.target.value }
-                      setPayInstallments(copy)
-                    }}
-                  />
+              <div key={i} className="flex items-end gap-2">
+                <div className="grid flex-1 grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <Label>Amount (₦) – installment {i + 1}</Label>
+                    <Input
+                      type="number"
+                      value={inst.amount}
+                      onChange={(e) => {
+                        const copy = [...payInstallments]
+                        copy[i] = { ...copy[i], amount: e.target.value }
+                        setPayInstallments(copy)
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Due date</Label>
+                    <Input
+                      type="date"
+                      value={inst.dueDate}
+                      onChange={(e) => {
+                        const copy = [...payInstallments]
+                        copy[i] = { ...copy[i], dueDate: e.target.value }
+                        setPayInstallments(copy)
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Due date</Label>
-                  <Input
-                    type="date"
-                    value={inst.dueDate}
-                    onChange={(e) => {
-                      const copy = [...payInstallments]
-                      copy[i] = { ...copy[i], dueDate: e.target.value }
-                      setPayInstallments(copy)
-                    }}
-                  />
-                </div>
+                {payInstallments.length > 1 && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="mb-0.5 shrink-0 text-destructive hover:text-destructive"
+                    onClick={() =>
+                      setPayInstallments((prev) => prev.filter((_, idx) => idx !== i))
+                    }
+                  >
+                    <IconTrash className="size-4" />
+                  </Button>
+                )}
               </div>
             ))}
             <Button

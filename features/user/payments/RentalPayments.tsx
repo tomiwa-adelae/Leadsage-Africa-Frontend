@@ -119,20 +119,24 @@ export function RentalPayments() {
   async function handlePayCard(paymentId: string) {
     setPaying(paymentId)
     try {
-      const { paymentUrl } = await postData<{ paymentUrl: string; reference: string }>(
-        `/user/rental-payments/${paymentId}/pay`,
-        {}
-      )
+      const { paymentUrl } = await postData<{
+        paymentUrl: string
+        reference: string
+      }>(`/user/rental-payments/${paymentId}/pay`, {})
       window.location.href = paymentUrl
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? "Failed to initialize payment")
+      toast.error(
+        err?.response?.data?.message ?? "Failed to initialize payment"
+      )
       setPaying(null)
     }
   }
 
   async function handlePayWallet(paymentId: string, amount: number) {
     if (walletBalance !== null && walletBalance < amount) {
-      toast.error(`Insufficient wallet balance. You have ${fmt(walletBalance)}.`)
+      toast.error(
+        `Insufficient wallet balance. You have ${fmt(walletBalance)}.`
+      )
       return
     }
     setPaying(paymentId)
@@ -280,8 +284,8 @@ export function RentalPayments() {
                             <Icon className="size-3" />
                             {cfg.label}
                           </span>
-                          {(p.status === "PENDING" || p.status === "OVERDUE") && (
-                            paying === p.id ? (
+                          {(p.status === "PENDING" || p.status === "OVERDUE") &&
+                            (paying === p.id ? (
                               <Button size="sm" disabled>
                                 <IconLoader2 className="size-3.5 animate-spin" />
                                 Processing…
@@ -294,14 +298,24 @@ export function RentalPayments() {
                                     <IconChevronDown className="size-3.5" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handlePayCard(p.id)}>
+                                <DropdownMenuContent
+                                  className="w-40"
+                                  align="end"
+                                >
+                                  <DropdownMenuItem
+                                    onClick={() => handlePayCard(p.id)}
+                                  >
                                     <IconCreditCard className="size-4" />
                                     Pay with Card
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    onClick={() => handlePayWallet(p.id, p.amount)}
-                                    disabled={walletBalance !== null && walletBalance < p.amount}
+                                    onClick={() =>
+                                      handlePayWallet(p.id, p.amount)
+                                    }
+                                    disabled={
+                                      walletBalance !== null &&
+                                      walletBalance < p.amount
+                                    }
                                   >
                                     <IconWallet className="size-4" />
                                     <span>
@@ -315,8 +329,7 @@ export function RentalPayments() {
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                            )
-                          )}
+                            ))}
                         </div>
                       </div>
                     )

@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { fetchData } from "@/lib/api"
+import { fetchData, postData } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -70,6 +70,24 @@ export function AdminAgreements() {
   const [agreements, setAgreements] = useState<Agreement[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState("ALL")
+  const [releasing, setReleasing] = useState(false)
+
+  async function handleReleaseOverdue() {
+    setReleasing(true)
+    try {
+      const res = await postData<{ backfilled: number; released: number }>(
+        "/admin/escrows/release-overdue",
+        {}
+      )
+      toast.success(
+        `Done — ${res.released} payment(s) released${res.backfilled > 0 ? `, ${res.backfilled} escrow record(s) backfilled` : ""}.`
+      )
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to release escrows")
+    } finally {
+      setReleasing(false)
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -88,9 +106,21 @@ export function AdminAgreements() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-bold">Rental Agreements</h1>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleReleaseOverdue}
+            disabled={releasing}
+          >
+            {releasing ? (
+              <IconLoader2 className="size-3.5 animate-spin" />
+            ) : null}
+            Release overdue payments
+          </Button>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-44">
             <SelectValue />
           </SelectTrigger>
@@ -102,6 +132,7 @@ export function AdminAgreements() {
             <SelectItem value="CANCELLED">Cancelled</SelectItem>
           </SelectContent>
         </Select>
+        </div>
       </div>
 
       {loading ? (

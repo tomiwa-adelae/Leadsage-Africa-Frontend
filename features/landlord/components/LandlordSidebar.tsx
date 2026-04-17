@@ -77,7 +77,12 @@ const mainLinks = [
 const bottomLinks = [
   { label: "Wallet", href: "/landlord/wallet", icon: IconWallet },
   { label: "Earnings", href: "/landlord/earnings", icon: IconCurrencyNaira },
-  { label: "Messages", href: "/landlord/messages", icon: IconMessage },
+  {
+    label: "Messages",
+    href: "/landlord/messages",
+    icon: IconMessage,
+    comingSoon: true,
+  },
   { label: "Notifications", href: "/landlord/notifications", icon: IconBell },
   { label: "Settings", href: "/landlord/settings", icon: IconSettings },
 ]

@@ -19,17 +19,24 @@ import { useAuth } from "@/store/useAuth"
 import { getNavByRole } from "@/lib/getNavByRole"
 import { Logo } from "./Logo"
 
-const sidebarData = {
-  navSecondary: [
-    { title: "Settings", url: "/settings", icon: IconSettings },
-    { title: "Get Help", url: "/help", icon: IconHelp, comingSoon: true },
-  ],
+function getSettingsUrl(role?: string | null) {
+  if (role === "ADMIN") return "/admin/settings"
+  if (role === "LANDLORD") return "/landlord/settings"
+  return "/settings"
 }
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
 
   const navItems = React.useMemo(() => getNavByRole(user), [user])
+
+  const navSecondary = React.useMemo(
+    () => [
+      { title: "Settings", url: getSettingsUrl(user?.role), icon: IconSettings },
+      { title: "Get Help", url: "/help", icon: IconHelp, comingSoon: true },
+    ],
+    [user?.role],
+  )
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -47,7 +54,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         <NavMain items={navItems} />
-        <NavSecondary items={sidebarData.navSecondary} className="mt-auto" />
+        <NavSecondary items={navSecondary} className="mt-auto" />
       </SidebarContent>
 
       <SidebarFooter>

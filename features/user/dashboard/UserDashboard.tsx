@@ -4,15 +4,15 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
-  IconLoader2,
   IconBookmark,
   IconClipboardList,
   IconCalendar,
   IconBell,
   IconMapPin,
-  IconCurrencyNaira,
   IconArrowRight,
-  IconBed,
+  IconPigMoney,
+  IconTrendingUp,
+  IconWallet,
 } from "@tabler/icons-react"
 
 import { fetchData } from "@/lib/api"
@@ -25,11 +25,26 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
+interface SavingsPlanSummary {
+  id: string
+  planName: string | null
+  totalDeposited: number
+  interestEarned: number
+  status: string
+}
+
 interface DashboardStats {
   saved: number
   applications: number
   bookings: number
   unreadNotifications: number
+  walletBalance: number
+  savings: {
+    activePlans: number
+    totalBalance: number
+    totalInterest: number
+    plans: SavingsPlanSummary[]
+  }
   recentApplications: RecentApplication[]
   recentBookings: RecentBooking[]
 }
@@ -229,6 +244,150 @@ export function UserDashboard() {
           accent={stats?.unreadNotifications ? "bg-red-500" : undefined}
         />
       </div>
+
+      {/* Savings + Wallet overview */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        {/* Wallet balance */}
+        <Link href="/wallet">
+          <Card className="h-full cursor-pointer transition-shadow hover:shadow-md">
+            <CardContent>
+              <div className="flex items-start justify-between">
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <IconWallet className="size-5 text-primary" />
+                </div>
+                <IconArrowRight className="size-4 text-muted-foreground" />
+              </div>
+              <div className="mt-4">
+                {loading ? (
+                  <Skeleton className="h-7 w-28" />
+                ) : (
+                  <p className="text-2xl font-bold">
+                    {fmt(stats?.walletBalance ?? 0)}
+                  </p>
+                )}
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Wallet Balance
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        {/* Savings total balance */}
+        <Link href="/firstkey">
+          <Card className="h-full cursor-pointer transition-shadow hover:shadow-md">
+            <CardContent>
+              <div className="flex items-start justify-between">
+                <div className="rounded-lg bg-emerald-100 p-2 dark:bg-emerald-900/30">
+                  <IconPigMoney className="size-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <IconArrowRight className="size-4 text-muted-foreground" />
+              </div>
+              <div className="mt-4">
+                {loading ? (
+                  <Skeleton className="h-7 w-28" />
+                ) : (
+                  <p className="text-2xl font-bold">
+                    {fmt(stats?.savings.totalBalance ?? 0)}
+                  </p>
+                )}
+                <p className="mt-1 text-sm text-muted-foreground">
+                  FirstKey Savings
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        {/* Interest earned */}
+        <Link href="/firstkey">
+          <Card className="h-full cursor-pointer transition-shadow hover:shadow-md">
+            <CardContent>
+              <div className="flex items-start justify-between">
+                <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
+                  <IconTrendingUp className="size-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <IconArrowRight className="size-4 text-muted-foreground" />
+              </div>
+              <div className="mt-4">
+                {loading ? (
+                  <Skeleton className="h-7 w-28" />
+                ) : (
+                  <p className="text-2xl font-bold text-emerald-600">
+                    +{fmt(stats?.savings.totalInterest ?? 0)}
+                  </p>
+                )}
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Interest Earned · 12% p.a.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      {/* Active savings plans */}
+      {(loading || (stats?.savings.plans.length ?? 0) > 0) && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between border-b">
+            <CardTitle className="text-base">FirstKey Savings Plans</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/firstkey">View all</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {loading ? (
+              Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="size-9 rounded-lg" />
+                  <div className="flex-1 space-y-1">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-3 w-1/4" />
+                  </div>
+                  <Skeleton className="h-5 w-16" />
+                </div>
+              ))
+            ) : (
+              stats?.savings.plans.map((plan) => (
+                <Link key={plan.id} href={`/firstkey/${plan.id}`}>
+                  <div className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/40">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                        <IconPigMoney className="size-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {plan.planName ?? "FirstKey Plan"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {fmt(plan.totalDeposited + plan.interestEarned)} saved
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-medium text-emerald-600">
+                        +{fmt(plan.interestEarned)} interest
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className={`mt-0.5 text-[10px] ${
+                          plan.status === "ACTIVE"
+                            ? "border-emerald-200 text-emerald-700"
+                            : plan.status === "MATURED"
+                              ? "border-blue-200 text-blue-700"
+                              : "text-muted-foreground"
+                        }`}
+                      >
+                        {plan.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Recent Applications */}

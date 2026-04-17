@@ -18,7 +18,7 @@ import {
   IconBolt,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
-import { updateData } from "@/lib/api"
+import { deleteData, updateData } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -38,6 +38,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { cn } from "@/lib/utils"
 import { PageHeader } from "@/components/PageHeader"
 import { useLandlordListings } from "../hooks/useLandlordListings"
@@ -127,6 +137,9 @@ export function ListingsTable() {
   const [dismissedBanners, setDismissedBanners] = useState<BackendListingStatus[]>([])
   const [togglingId, setTogglingId] = useState<string | null>(null)
   const [markingAvailableId, setMarkingAvailableId] = useState<string | null>(null)
+  const [archiveTarget, setArchiveTarget] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [actioning, setActioning] = useState(false)
 
   async function handleMarkAvailable(listingId: string) {
     setMarkingAvailableId(listingId)
@@ -161,6 +174,40 @@ export function ListingsTable() {
       toast.error(typeof msg === "string" ? msg : "Failed to update setting")
     } finally {
       setTogglingId(null)
+    }
+  }
+
+  async function handleArchive() {
+    if (!archiveTarget) return
+    setActioning(true)
+    try {
+      await updateData(`/listings/${archiveTarget}/archive`, {})
+      setListings((prev) =>
+        prev.map((l) =>
+          l.id === archiveTarget ? { ...l, status: "ARCHIVED" as const } : l
+        )
+      )
+      toast.success("Listing archived")
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to archive listing")
+    } finally {
+      setActioning(false)
+      setArchiveTarget(null)
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return
+    setActioning(true)
+    try {
+      await deleteData(`/listings/${deleteTarget}`)
+      setListings((prev) => prev.filter((l) => l.id !== deleteTarget))
+      toast.success("Listing deleted")
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to delete listing")
+    } finally {
+      setActioning(false)
+      setDeleteTarget(null)
     }
   }
 
@@ -462,10 +509,17 @@ export function ListingsTable() {
                             </>
                           )}
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <IconArchive className="size-4" /> Archive
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive focus:text-destructive">
+                          {listing.status !== "ARCHIVED" && (
+                            <DropdownMenuItem
+                              onClick={() => setArchiveTarget(listing.id)}
+                            >
+                              <IconArchive className="size-4" /> Archive
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => setDeleteTarget(listing.id)}
+                          >
                             <IconTrash className="size-4" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -484,6 +538,57 @@ export function ListingsTable() {
           Showing {filtered.length} of {listings.length} listings
         </p>
       )}
+
+      {/* Archive confirmation */}
+      <AlertDialog
+        open={!!archiveTarget}
+        onOpenChange={(open) => !open && setArchiveTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Archive this listing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The listing will be hidden from renters and marked as archived. You
+              can contact support to restore it if needed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actioning}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleArchive} disabled={actioning}>
+              {actioning && <IconLoader2 className="size-4 animate-spin" />}
+              Archive
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this listing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the listing. Any active bookings or
+              applications linked to it will remain, but the listing will no
+              longer be visible. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actioning}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={actioning}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {actioning && <IconLoader2 className="size-4 animate-spin" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -128,6 +128,15 @@ export async function uploadFile<T>(
   })
   return res.data
 }
+export async function uploadFilePatch<T>(
+  url: string,
+  formData: FormData
+): Promise<T> {
+  const res = await api.patch(url, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+  return res.data
+}
 
 // ── Public (unauthenticated) helper ───────────────────────────────────────────
 // Uses a plain fetch so it never triggers the auth interceptor / redirect.

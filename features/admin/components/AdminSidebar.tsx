@@ -15,6 +15,7 @@ import {
   IconHomeDot,
   IconFileText,
   IconUserCheck,
+  IconPigMoney,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -70,11 +71,20 @@ const mainLinks = [
     href: "/admin/bookings",
     icon: IconCalendarEvent,
   },
+  {
+    label: "FirstKey Savings",
+    href: "/admin/savings",
+    icon: IconPigMoney,
+  },
 ]
 
 const rentalLinks = [
   { label: "Property Tours", href: "/admin/tours", icon: IconHomeDot },
-  { label: "Screening Applications", href: "/admin/screening-applications", icon: IconUserCheck },
+  {
+    label: "Screening Applications",
+    href: "/admin/screening-applications",
+    icon: IconUserCheck,
+  },
   { label: "Agreements", href: "/admin/agreements", icon: IconFileText },
 ]
 
@@ -95,10 +105,9 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + "/")
 
-  const initials =
-    user
-      ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase()
-      : "AD"
+  const initials = user
+    ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase()
+    : "AD"
 
   async function handleSignOut() {
     try {
@@ -125,7 +134,7 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
               className="hover:bg-transparent active:bg-transparent"
             >
               <Link href="/admin/dashboard">
-                <Logo />
+                <Logo color="green" />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -225,8 +234,11 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
                   className="data-[state=open]:bg-sidebar-accent"
                 >
                   <Avatar className="size-8 rounded-lg">
-                    <AvatarImage src={user?.image ?? ""} alt={user?.firstName ?? ""} />
-                    <AvatarFallback className="rounded-lg bg-primary text-primary-foreground text-xs font-semibold">
+                    <AvatarImage
+                      src={user?.image ?? ""}
+                      alt={user?.firstName ?? ""}
+                    />
+                    <AvatarFallback className="rounded-lg bg-primary text-xs font-semibold text-primary-foreground">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -241,7 +253,11 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
                   <IconChevronRight className="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" className="w-56 rounded-lg">
+              <DropdownMenuContent
+                side="top"
+                align="start"
+                className="w-56 rounded-lg"
+              >
                 <div className="px-3 py-2">
                   <p className="text-xs font-medium">{user?.email}</p>
                   <div className="mt-1 flex items-center gap-1">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   IconLoader2,
@@ -496,22 +497,54 @@ export function SavingsPlanDetail({ id }: { id: string }) {
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [txPage, setTxPage] = useState(1)
+  const [txTotal, setTxTotal] = useState(0)
+  const [txLoading, setTxLoading] = useState(false)
+  const TX_PAGE_SIZE = 20
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [data, wallet] = await Promise.all([
+      const [data, wallet, txData] = await Promise.all([
         fetchData<PlanDetail>(`/savings/${id}`),
         fetchData<{ availableBalance: number }>("/wallet").catch(() => null),
+        fetchData<{ transactions: Transaction[]; total: number }>(
+          `/savings/${id}/transactions?page=1&limit=${TX_PAGE_SIZE}`,
+        ).catch(() => null),
       ])
       setPlan(data)
       if (wallet) setWalletBalance(wallet.availableBalance)
+      if (txData) {
+        setPlan((prev) => prev ? { ...prev, transactions: txData.transactions } : prev)
+        setTxTotal(txData.total)
+        setTxPage(1)
+      }
     } catch {
       toast.error("Failed to load plan")
     } finally {
       setLoading(false)
     }
   }, [id])
+
+  const loadMoreTx = async () => {
+    if (txLoading) return
+    setTxLoading(true)
+    try {
+      const nextPage = txPage + 1
+      const data = await fetchData<{ transactions: Transaction[]; total: number }>(
+        `/savings/${id}/transactions?page=${nextPage}&limit=${TX_PAGE_SIZE}`,
+      )
+      setPlan((prev) =>
+        prev ? { ...prev, transactions: [...prev.transactions, ...data.transactions] } : prev,
+      )
+      setTxPage(nextPage)
+      setTxTotal(data.total)
+    } catch {
+      toast.error("Failed to load more transactions")
+    } finally {
+      setTxLoading(false)
+    }
+  }
 
   useEffect(() => {
     load()
@@ -699,73 +732,86 @@ export function SavingsPlanDetail({ id }: { id: string }) {
         </Card>
       )}
 
-      {/* Bank account details */}
-      {plan.paymentMethod === "BANK_TRANSFER" && (
-        <Card>
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2">
-              <IconBuildingBank className="size-4" />
-              Your Savings Account
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {plan.nuban ? (
-              <div className="space-y-1 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Account number</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold tracking-wider">
-                      {plan.nuban}
-                    </span>
-                    <button onClick={copyNuban}>
-                      {copied ? (
-                        <IconCheck className="size-4 text-emerald-600" />
-                      ) : (
-                        <IconCopy className="size-4 text-muted-foreground hover:text-foreground" />
-                      )}
-                    </button>
-                  </div>
+      {/* Bank account details — shown for all plans */}
+      <Card>
+        <CardHeader className="border-b">
+          <CardTitle className="flex items-center gap-2">
+            <IconBuildingBank className="size-4" />
+            Your Savings Account
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {plan.nuban ? (
+            <div className="space-y-1 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Account number</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-semibold tracking-wider">
+                    {plan.nuban}
+                  </span>
+                  <button onClick={copyNuban}>
+                    {copied ? (
+                      <IconCheck className="size-4 text-emerald-600" />
+                    ) : (
+                      <IconCopy className="size-4 text-muted-foreground hover:text-foreground" />
+                    )}
+                  </button>
                 </div>
-                {plan.bankName && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Bank</span>
-                    <span>{plan.bankName}</span>
-                  </div>
-                )}
-                {plan.accountName && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Account name</span>
-                    <span>{plan.accountName}</span>
-                  </div>
-                )}
-                <p className="pt-1 text-xs text-muted-foreground">
-                  Transfer to this account from any bank. Funds reflect
-                  instantly.
+              </div>
+              {plan.bankName && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Bank</span>
+                  <span>{plan.bankName}</span>
+                </div>
+              )}
+              {plan.accountName && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Account name</span>
+                  <span>{plan.accountName}</span>
+                </div>
+              )}
+              <p className="pt-1 text-xs text-muted-foreground">
+                Transfer to this account from any bank. Funds reflect instantly.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-900 dark:bg-amber-950/30">
+                <p className="font-medium text-amber-800 dark:text-amber-400">
+                  Account number not generated yet
+                </p>
+                <p className="mt-1 text-xs text-amber-700 dark:text-amber-500">
+                  A dedicated NUBAN is required to receive bank transfers into
+                  this plan. Generating one requires{" "}
+                  <Link
+                    href="/wallet"
+                    className="underline underline-offset-2 hover:text-amber-900 dark:hover:text-amber-300"
+                  >
+                    wallet BVN verification
+                  </Link>{" "}
+                  to be completed first.
                 </p>
               </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Your dedicated account number hasn't been generated yet.
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setDepositOpen(true)}
-                >
-                  <IconBuildingBank className="size-4" />
-                  Generate Account Number
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setDepositOpen(true)}
+              >
+                <IconBuildingBank className="size-4" />
+                Generate Account Number
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Transaction history */}
       <Card>
-        <CardHeader className="border-b">
+        <CardHeader className="flex flex-row items-center justify-between border-b">
           <CardTitle>Transaction History</CardTitle>
+          <span className="text-xs text-muted-foreground">
+            {txTotal > 0 ? `${plan.transactions.length} of ${txTotal}` : ""}
+          </span>
         </CardHeader>
         <CardContent>
           {plan.transactions.length === 0 ? (
@@ -804,6 +850,22 @@ export function SavingsPlanDetail({ id }: { id: string }) {
                   </div>
                 )
               })}
+
+              {plan.transactions.length < txTotal && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-1 w-full"
+                  onClick={loadMoreTx}
+                  disabled={txLoading}
+                >
+                  {txLoading ? (
+                    <IconLoader2 className="size-4 animate-spin" />
+                  ) : (
+                    `Load more (${txTotal - plan.transactions.length} remaining)`
+                  )}
+                </Button>
+              )}
             </div>
           )}
         </CardContent>

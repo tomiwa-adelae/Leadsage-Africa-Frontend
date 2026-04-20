@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   IconCreditCard,
@@ -8,9 +8,10 @@ import {
   IconUserCircle,
   IconArrowLeft,
   IconShieldFilled,
-} from "@tabler/icons-react";
+  IconBuildingSkyscraper,
+} from "@tabler/icons-react"
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,28 +20,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { DEFAULT_PROFILE_IMAGE } from "@/constants";
-import { useAuth } from "@/store/useAuth";
-import { useSignout } from "@/hooks/use-signout";
-import { Badge } from "./ui/badge";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+} from "@/components/ui/sidebar"
+import { DEFAULT_PROFILE_IMAGE } from "@/constants"
+import { useAuth } from "@/store/useAuth"
+import { useSignout } from "@/hooks/use-signout"
+import { Badge } from "./ui/badge"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export function NavUser() {
-  const { user } = useAuth();
-  const { isMobile } = useSidebar();
-  const handleSignout = useSignout();
-  const pathname = usePathname();
-  const isAdminArea = pathname.startsWith("/a/") || pathname === "/a";
+  const { user } = useAuth()
+  const { isMobile } = useSidebar()
+  const handleSignout = useSignout()
+  const pathname = usePathname()
+  const isAdminArea = pathname.startsWith("/a/") || pathname === "/a"
+  const isLandlordArea = pathname.startsWith("/landlord")
+  const initials =
+    `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase() ||
+    "LA"
 
-  if (!user) return null;
+  if (!user) return null
 
   return (
     <SidebarMenu>
@@ -55,15 +60,15 @@ export function NavUser() {
                 <AvatarImage
                   src={user?.image || DEFAULT_PROFILE_IMAGE}
                   alt={`${user?.firstName}'s picture` || ""}
-                  className="object-cover size-full"
+                  className="size-full object-cover"
                 />
-                <AvatarFallback>Ekovibe</AvatarFallback>
+                <AvatarFallback>Leadsage Africa</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {user.firstName} {user?.lastName}
                 </span>
-                <span className="text-muted-foreground truncate text-xs">
+                <span className="truncate text-xs text-muted-foreground">
                   {user.email}
                 </span>
               </div>
@@ -82,13 +87,15 @@ export function NavUser() {
                   <AvatarImage
                     src={user?.image || DEFAULT_PROFILE_IMAGE}
                     alt={`${user?.firstName}'s picture` || ""}
-                    className="object-cover size-full"
+                    className="size-full object-cover"
                   />
-                  <AvatarFallback>Ekovibe</AvatarFallback>
+                  <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.firstName}</span>
-                  <span className="text-muted-foreground truncate text-xs">
+                  <span className="truncate font-medium">
+                    {user.firstName} {user.lastName}
+                  </span>
+                  <span className="truncate text-xs text-muted-foreground">
                     {user.email}
                   </span>
                 </div>
@@ -119,19 +126,36 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              {isAdminArea ? (
-                <Link href="/dashboard">
-                  <IconArrowLeft />
-                  Member View
-                </Link>
-              ) : (
-                <Link href="/a/dashboard">
-                  <IconShieldFilled />
-                  Admin Dashboard
-                </Link>
-              )}
-            </DropdownMenuItem>
+            {user.role === "ADMIN" && (
+              <DropdownMenuItem asChild>
+                {isAdminArea ? (
+                  <Link href="/dashboard">
+                    <IconArrowLeft />
+                    Member View
+                  </Link>
+                ) : (
+                  <Link href="/a/dashboard">
+                    <IconShieldFilled />
+                    Admin Dashboard
+                  </Link>
+                )}
+              </DropdownMenuItem>
+            )}
+            {user.role === "LANDLORD" && (
+              <DropdownMenuItem asChild>
+                {isLandlordArea ? (
+                  <Link href="/dashboard">
+                    <IconArrowLeft />
+                    Customer View
+                  </Link>
+                ) : (
+                  <Link href="/landlord/dashboard">
+                    <IconBuildingSkyscraper />
+                    Landlord Dashboard
+                  </Link>
+                )}
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignout}>
               <IconLogout />
@@ -141,5 +165,5 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  );
+  )
 }

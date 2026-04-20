@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import {
   IconArrowLeft,
@@ -14,24 +14,49 @@ import {
   IconWallet,
   IconCreditCard,
   IconBuilding,
+  IconCopy,
+  IconRefresh,
+  IconExternalLink,
+  IconLock,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { postData } from "@/lib/api"
+import { postData, fetchData } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type Duration = "ONE_YEAR" | "TWO_YEARS" | "UNTIL_GRADUATION"
+type Duration = "SIX_MONTHS" | "ONE_YEAR" | "TWO_YEARS" | "UNTIL_GRADUATION"
 type Frequency = "DAILY" | "WEEKLY" | "MONTHLY" | "CUSTOM"
 type PaymentMethod = "WALLET" | "CARD" | "BANK_TRANSFER"
 
 interface FormState {
+  schoolName: string
   academicLevel: string
   expectedGradYear: number
+  expectedGradMonth: number | undefined
   duration: Duration | ""
   contributionAmount: string
   frequency: Frequency | ""
@@ -43,8 +68,10 @@ interface FormState {
   planName: string
 }
 
+const SCHOOLS = [{ value: "covenant_university", label: "Covenant University" }]
+
 const STEPS = [
-  "Academic Level",
+  "School & Level",
   "Duration",
   "Frequency",
   "Savings Target",
@@ -57,9 +84,21 @@ const ACADEMIC_LEVELS = [
   { value: "300", label: "300 Level", sub: "Junior Year" },
   { value: "400", label: "400 Level", sub: "Senior Year" },
   { value: "500", label: "500 Level", sub: "Final Professional Year" },
+  { value: "PGD", label: "PGD", sub: "Postgraduate Diploma" },
+  {
+    value: "MSC",
+    label: "Masters (MSc / MBA / MA)",
+    sub: "Postgraduate Degree",
+  },
+  { value: "PHD", label: "PhD", sub: "Doctoral Programme" },
 ]
 
 const DURATIONS: { value: Duration; label: string; desc: string }[] = [
+  {
+    value: "SIX_MONTHS",
+    label: "6 Months",
+    desc: "A quick sprint — great for a semester or short-term goal",
+  },
   {
     value: "ONE_YEAR",
     label: "1 Year",
@@ -124,6 +163,14 @@ const PAYMENT_METHODS: {
   },
 ]
 
+const NIGERIAN_STATES = [
+  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue",
+  "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu",
+  "FCT - Abuja", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina",
+  "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo",
+  "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
+]
+
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 const TARGET_PRESETS = [300_000, 500_000, 800_000]
 
@@ -133,6 +180,12 @@ const fmt = (n: number) =>
     currency: "NGN",
     maximumFractionDigits: 0,
   }).format(n)
+
+const ordinal = (n: number) => {
+  const s = ["th", "st", "nd", "rd"]
+  const v = n % 100
+  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
+}
 
 // ── Selection Card ─────────────────────────────────────────────────────────────
 
@@ -184,6 +237,25 @@ function StepAcademicLevel({
         </p>
       </div>
 
+      <div className="space-y-1">
+        <Label>Your school</Label>
+        <Select
+          value={form.schoolName}
+          onValueChange={(v) => onChange("schoolName", v)}
+        >
+          <SelectTrigger className="max-w-sm">
+            <SelectValue placeholder="Select your university" />
+          </SelectTrigger>
+          <SelectContent>
+            {SCHOOLS.map((s) => (
+              <SelectItem key={s.value} value={s.value}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {ACADEMIC_LEVELS.map((level) => (
           <SelectCard
@@ -204,17 +276,23 @@ function StepAcademicLevel({
 
       <div className="space-y-1">
         <Label>Expected graduation year</Label>
-        <Input
-          type="number"
-          min={currentYear}
-          max={currentYear + 8}
-          value={form.expectedGradYear || ""}
-          onChange={(e) =>
-            onChange("expectedGradYear", parseInt(e.target.value))
-          }
-          placeholder={String(currentYear + 2)}
-          className="max-w-xs"
-        />
+        <Select
+          value={form.expectedGradYear ? String(form.expectedGradYear) : ""}
+          onValueChange={(v) => onChange("expectedGradYear", parseInt(v))}
+        >
+          <SelectTrigger className="max-w-xs">
+            <SelectValue placeholder="Select year" />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: 9 }, (_, i) => currentYear + i).map(
+              (year) => (
+                <SelectItem key={year} value={String(year)}>
+                  {year}
+                </SelectItem>
+              )
+            )}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* <div className="space-y-1">
@@ -229,6 +307,21 @@ function StepAcademicLevel({
     </div>
   )
 }
+
+const MONTHS = [
+  { value: 1, label: "January" },
+  { value: 2, label: "February" },
+  { value: 3, label: "March" },
+  { value: 4, label: "April" },
+  { value: 5, label: "May" },
+  { value: 6, label: "June" },
+  { value: 7, label: "July" },
+  { value: 8, label: "August" },
+  { value: 9, label: "September" },
+  { value: 10, label: "October" },
+  { value: 11, label: "November" },
+  { value: 12, label: "December" },
+]
 
 function StepDuration({
   form,
@@ -266,6 +359,30 @@ function StepDuration({
           </SelectCard>
         ))}
       </div>
+
+      {form.duration === "UNTIL_GRADUATION" && (
+        <div className="space-y-1">
+          <Label>Expected graduation month</Label>
+          <p className="text-xs text-muted-foreground">
+            Which month in {form.expectedGradYear} do you graduate?
+          </p>
+          <Select
+            value={form.expectedGradMonth ? String(form.expectedGradMonth) : ""}
+            onValueChange={(v) => onChange("expectedGradMonth", parseInt(v))}
+          >
+            <SelectTrigger className="max-w-xs">
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent>
+              {MONTHS.map((m) => (
+                <SelectItem key={m.value} value={String(m.value)}>
+                  {m.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </div>
   )
 }
@@ -341,15 +458,49 @@ function StepFrequency({
       {form.frequency === "MONTHLY" && (
         <div className="space-y-1">
           <Label>Preferred day of month</Label>
-          <Input
-            type="number"
-            min={1}
-            max={28}
-            value={form.preferredDay ?? ""}
-            onChange={(e) => onChange("preferredDay", parseInt(e.target.value))}
-            placeholder="e.g. 1 (first of the month)"
-            className="max-w-xs"
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className={cn(
+                  "flex h-11 items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors hover:border-[#1a3d2b]/40",
+                  form.preferredDay
+                    ? "border-[#1a3d2b] text-foreground"
+                    : "border-border text-muted-foreground"
+                )}
+              >
+                <IconCalendar className="size-4 text-[#1a3d2b] dark:text-green-400" />
+                {form.preferredDay
+                  ? `${ordinal(form.preferredDay)} of every month`
+                  : "Pick a day"}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-3" align="start">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                Select the day contributions are taken
+              </p>
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => onChange("preferredDay", day)}
+                    className={cn(
+                      "flex size-8 items-center justify-center rounded-md text-xs font-medium transition-colors",
+                      form.preferredDay === day
+                        ? "bg-[#1a3d2b] text-white dark:bg-green-700"
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground">
+                Days 29–31 are skipped in shorter months
+              </p>
+            </PopoverContent>
+          </Popover>
         </div>
       )}
 
@@ -445,12 +596,21 @@ function StepTarget({
           </SelectCard>
         </div>
         {!form.useCurrentCity && (
-          <Input
+          <Select
             value={form.rentalLocation}
-            onChange={(e) => onChange("rentalLocation", e.target.value)}
-            placeholder="e.g. Lagos Island"
-            className="max-w-sm"
-          />
+            onValueChange={(v) => onChange("rentalLocation", v)}
+          >
+            <SelectTrigger className="max-w-sm">
+              <SelectValue placeholder="Select a state" />
+            </SelectTrigger>
+            <SelectContent>
+              {NIGERIAN_STATES.map((state) => (
+                <SelectItem key={state} value={state}>
+                  {state}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
       </div>
     </div>
@@ -510,15 +670,427 @@ function StepPaymentMethod({
   )
 }
 
+// ── Commitment Modal ───────────────────────────────────────────────────────────
+
+interface WalletInfo {
+  availableBalance: number
+  virtualAccountNo?: string
+  virtualBankName?: string
+  virtualAccountName?: string
+}
+
+function buildPayload(form: FormState) {
+  return {
+    schoolName: form.schoolName,
+    academicLevel: form.academicLevel,
+    expectedGradYear: form.expectedGradYear,
+    expectedGradMonth: form.expectedGradMonth,
+    duration: form.duration,
+    contributionAmount: parseFloat(form.contributionAmount),
+    frequency: form.frequency,
+    preferredDay: form.preferredDay,
+    savingsTarget: form.savingsTarget ? parseFloat(form.savingsTarget) : undefined,
+    rentalLocation: form.useCurrentCity ? undefined : form.rentalLocation || undefined,
+    paymentMethod: form.paymentMethod,
+    planName: form.planName || undefined,
+  }
+}
+
+function CommitmentModal({
+  open,
+  onClose,
+  form,
+  onDone,
+}: {
+  open: boolean
+  onClose: () => void
+  form: FormState
+  onDone: (planId: string) => void
+}) {
+  const amount = parseFloat(form.contributionAmount) || 0
+  const [tab, setTab] = useState<"wallet" | "card" | "transfer">("wallet")
+  const [wallet, setWallet] = useState<WalletInfo | null>(null)
+  const [fetchingWallet, setFetchingWallet] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [cardState, setCardState] = useState<{
+    planId: string
+    reference: string
+  } | null>(null)
+  const [copied, setCopied] = useState<string | null>(null)
+
+  const loadWallet = useCallback(async () => {
+    setFetchingWallet(true)
+    try {
+      const data = await fetchData<WalletInfo>("/wallet")
+      setWallet(data)
+    } catch {
+      toast.error("Could not load wallet")
+    } finally {
+      setFetchingWallet(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (open) {
+      setTab("wallet")
+      setCardState(null)
+      loadWallet()
+    }
+  }, [open, loadWallet])
+
+  const sufficient = (wallet?.availableBalance ?? 0) >= amount
+  const shortfall = Math.max(0, amount - (wallet?.availableBalance ?? 0))
+
+  const copy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(key)
+    setTimeout(() => setCopied(null), 2000)
+  }
+
+  // Wallet tab: create plan + deduct first contribution
+  const activateWithWallet = async () => {
+    setLoading(true)
+    try {
+      const plan = await postData<{ id: string }>("/savings", buildPayload(form))
+      await postData(`/savings/${plan.id}/deposit`, { amount })
+      toast.success("Your FirstKey plan is live! First contribution deposited.")
+      onDone(plan.id)
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to activate plan")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Card tab: create plan → init Paystack → open in new tab
+  const initiateCardPayment = async () => {
+    setLoading(true)
+    try {
+      const plan = await postData<{ id: string }>("/savings", buildPayload(form))
+      const { paymentUrl, reference } = await postData<{
+        paymentUrl: string
+        reference: string
+      }>(`/savings/${plan.id}/deposit/card`, { amount })
+      setCardState({ planId: plan.id, reference })
+      window.open(paymentUrl, "_blank")
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to initialise payment")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const verifyCardPayment = async () => {
+    if (!cardState) return
+    setLoading(true)
+    try {
+      await postData(`/savings/${cardState.planId}/deposit/card/verify`, {
+        reference: cardState.reference,
+      })
+      toast.success("Payment confirmed! Your FirstKey plan is live.")
+      onDone(cardState.planId)
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Could not verify payment")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Transfer tab: refresh balance → create plan + wallet deposit when sufficient
+  const activateAfterTransfer = async () => {
+    setLoading(true)
+    try {
+      const fresh = await fetchData<WalletInfo>("/wallet")
+      setWallet(fresh)
+      if (fresh.availableBalance < amount) {
+        toast.error(
+          `Balance still low — ₦${fmt(fresh.availableBalance)} available, ₦${fmt(amount)} needed`
+        )
+        return
+      }
+      const plan = await postData<{ id: string }>("/savings", buildPayload(form))
+      await postData(`/savings/${plan.id}/deposit`, { amount })
+      toast.success("Your FirstKey plan is live! First contribution deposited.")
+      onDone(plan.id)
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to activate plan")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const TABS = [
+    { key: "wallet" as const, label: "Wallet", icon: IconWallet },
+    { key: "card" as const, label: "Card", icon: IconCreditCard },
+    { key: "transfer" as const, label: "Bank Transfer", icon: IconBuilding },
+  ]
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <div className="flex items-center gap-2">
+            <span className="flex size-8 items-center justify-center rounded-full bg-[#1a3d2b]/10">
+              <IconLock className="size-4 text-[#1a3d2b] dark:text-green-400" />
+            </span>
+            <DialogTitle>Activate your FirstKey plan</DialogTitle>
+          </div>
+          <DialogDescription>
+            Make your first contribution of{" "}
+            <span className="font-semibold text-foreground">{fmt(amount)}</span>{" "}
+            to get started — it goes straight into your savings.
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Tab switcher */}
+        <div className="flex gap-1 rounded-xl bg-muted p-1">
+          {TABS.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => { setTab(key); setCardState(null) }}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-medium transition-colors",
+                tab === key
+                  ? "bg-background shadow-sm text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon className="size-3.5" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Wallet tab ── */}
+        {tab === "wallet" && (
+          <div className="space-y-4">
+            <div className="rounded-xl border bg-muted/40 p-4">
+              <p className="text-xs text-muted-foreground">Wallet balance</p>
+              {fetchingWallet ? (
+                <div className="mt-1 h-7 w-28 animate-pulse rounded bg-muted" />
+              ) : (
+                <p className="mt-0.5 text-2xl font-bold tabular-nums">
+                  {fmt(wallet?.availableBalance ?? 0)}
+                </p>
+              )}
+            </div>
+
+            {sufficient ? (
+              <div className="space-y-2">
+                <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                  You have sufficient balance. Click below to activate.
+                </p>
+                <Button
+                  className="w-full bg-[#1a3d2b] hover:bg-[#1a3d2b]/90"
+                  onClick={activateWithWallet}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <IconLoader2 className="size-4 animate-spin" />
+                  ) : (
+                    <IconCheck className="size-4" />
+                  )}
+                  Activate — deduct {fmt(amount)}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                  You need{" "}
+                  <span className="font-semibold">{fmt(shortfall)}</span> more.
+                  Top up your wallet using card or bank transfer.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setTab("card")}
+                  >
+                    Pay by card
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setTab("transfer")}
+                  >
+                    Bank transfer
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Card tab ── */}
+        {tab === "card" && (
+          <div className="space-y-4">
+            {!cardState ? (
+              <>
+                <div className="rounded-xl border bg-muted/40 p-4">
+                  <p className="text-xs text-muted-foreground">Amount to pay</p>
+                  <p className="mt-0.5 text-2xl font-bold tabular-nums">
+                    {fmt(amount)}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Charged once via Paystack — your plan activates immediately after.
+                  </p>
+                </div>
+                <Button
+                  className="w-full bg-[#1a3d2b] hover:bg-[#1a3d2b]/90"
+                  onClick={initiateCardPayment}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <IconLoader2 className="size-4 animate-spin" />
+                  ) : (
+                    <IconExternalLink className="size-4" />
+                  )}
+                  Pay {fmt(amount)} with card
+                </Button>
+              </>
+            ) : (
+              <>
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                    Complete payment in the new tab
+                  </p>
+                  <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                    Once you've paid, click below to confirm and activate your plan.
+                  </p>
+                </div>
+                <Button
+                  className="w-full bg-[#1a3d2b] hover:bg-[#1a3d2b]/90"
+                  onClick={verifyCardPayment}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <IconLoader2 className="size-4 animate-spin" />
+                  ) : (
+                    <IconCheck className="size-4" />
+                  )}
+                  I've paid — activate my plan
+                </Button>
+                <button
+                  type="button"
+                  onClick={initiateCardPayment}
+                  className="w-full text-center text-xs text-muted-foreground underline-offset-2 hover:underline"
+                >
+                  Reopen payment page
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── Transfer tab ── */}
+        {tab === "transfer" && (
+          <div className="space-y-4">
+            <div className="rounded-xl border bg-muted/40 p-4 space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Transfer exactly this amount to your Leadsage wallet:
+              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-xl font-bold tabular-nums">{fmt(amount)}</p>
+                <button
+                  type="button"
+                  onClick={() => copy(String(amount), "amount")}
+                  className="flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-muted"
+                >
+                  {copied === "amount" ? (
+                    <IconCheck className="size-3 text-emerald-500" />
+                  ) : (
+                    <IconCopy className="size-3" />
+                  )}
+                  Copy
+                </button>
+              </div>
+
+              {wallet?.virtualAccountNo ? (
+                <div className="space-y-1.5 pt-1 border-t">
+                  <p className="text-xs text-muted-foreground">Account details</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold tabular-nums tracking-wide">
+                        {wallet.virtualAccountNo}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {wallet.virtualBankName} · {wallet.virtualAccountName}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copy(wallet.virtualAccountNo!, "nuban")}
+                      className="flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-muted"
+                    >
+                      {copied === "nuban" ? (
+                        <IconCheck className="size-3 text-emerald-500" />
+                      ) : (
+                        <IconCopy className="size-3" />
+                      )}
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground pt-1 border-t">
+                  Complete wallet KYC to get your account number.
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadWallet}
+                disabled={fetchingWallet || loading}
+                className="gap-1.5"
+              >
+                <IconRefresh
+                  className={cn("size-3.5", fetchingWallet && "animate-spin")}
+                />
+                Refresh balance
+              </Button>
+              {wallet && (
+                <p className="self-center text-xs text-muted-foreground">
+                  {fmt(wallet.availableBalance)} available
+                </p>
+              )}
+            </div>
+
+            <Button
+              className="w-full bg-[#1a3d2b] hover:bg-[#1a3d2b]/90"
+              onClick={activateAfterTransfer}
+              disabled={loading || (wallet?.availableBalance ?? 0) < amount}
+            >
+              {loading ? (
+                <IconLoader2 className="size-4 animate-spin" />
+              ) : (
+                <IconCheck className="size-4" />
+              )}
+              I've transferred — activate my plan
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export function NewSavingsPlan() {
   const router = useRouter()
   const [step, setStep] = useState(0)
-  const [submitting, setSubmitting] = useState(false)
+  const [showCommitModal, setShowCommitModal] = useState(false)
   const [form, setForm] = useState<FormState>({
+    schoolName: "",
     academicLevel: "",
     expectedGradYear: new Date().getFullYear() + 2,
+    expectedGradMonth: undefined,
     duration: "",
     contributionAmount: "",
     frequency: "",
@@ -534,8 +1106,17 @@ export function NewSavingsPlan() {
     setForm((prev) => ({ ...prev, [k]: v }))
 
   const canProceed = (): boolean => {
-    if (step === 0) return !!form.academicLevel && form.expectedGradYear > 2020
-    if (step === 1) return !!form.duration
+    if (step === 0)
+      return (
+        !!form.schoolName &&
+        !!form.academicLevel &&
+        form.expectedGradYear > 2020
+      )
+    if (step === 1)
+      return (
+        !!form.duration &&
+        (form.duration !== "UNTIL_GRADUATION" || !!form.expectedGradMonth)
+      )
     if (step === 2)
       return (
         !!form.frequency &&
@@ -547,33 +1128,9 @@ export function NewSavingsPlan() {
     return false
   }
 
-  const handleSubmit = async () => {
-    setSubmitting(true)
-    try {
-      const payload = {
-        academicLevel: form.academicLevel,
-        expectedGradYear: form.expectedGradYear,
-        duration: form.duration,
-        contributionAmount: parseFloat(form.contributionAmount),
-        frequency: form.frequency,
-        preferredDay: form.preferredDay,
-        savingsTarget: form.savingsTarget
-          ? parseFloat(form.savingsTarget)
-          : undefined,
-        rentalLocation: form.useCurrentCity
-          ? undefined
-          : form.rentalLocation || undefined,
-        paymentMethod: form.paymentMethod,
-        planName: form.planName || undefined,
-      }
-
-      const plan = await postData<{ id: string }>("/savings", payload)
-      toast.success("Your FirstKey savings plan is ready!")
-      router.push(`/firstkey/${plan.id}`)
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? "Failed to create plan")
-      setSubmitting(false)
-    }
+  const handleDone = (planId: string) => {
+    setShowCommitModal(false)
+    router.push(`/firstkey/${planId}`)
   }
 
   const steps = [
@@ -632,16 +1189,19 @@ export function NewSavingsPlan() {
             <IconArrowRight className="size-4" />
           </Button>
         ) : (
-          <Button onClick={handleSubmit} disabled={!canProceed() || submitting}>
-            {submitting ? (
-              <IconLoader2 className="size-4 animate-spin" />
-            ) : (
-              <IconCheck className="size-4" />
-            )}
-            {submitting ? "Creating…" : "Create Plan"}
+          <Button onClick={() => setShowCommitModal(true)} disabled={!canProceed()}>
+            <IconLock className="size-4" />
+            Activate Plan
           </Button>
         )}
       </div>
+
+      <CommitmentModal
+        open={showCommitModal}
+        onClose={() => setShowCommitModal(false)}
+        form={form}
+        onDone={handleDone}
+      />
     </div>
   )
 }

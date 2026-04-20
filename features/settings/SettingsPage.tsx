@@ -306,8 +306,7 @@ function SecurityForm() {
       toast.success("Password changed successfully")
       form.reset()
     } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ?? "Failed to change password"
+      const msg = err?.response?.data?.message ?? "Failed to change password"
       toast.error(msg)
     } finally {
       setSaving(false)
@@ -316,7 +315,10 @@ function SecurityForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-md">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="max-w-md space-y-6"
+      >
         <FormField
           control={form.control}
           name="currentPassword"
@@ -374,6 +376,7 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
+        back
         title="Settings"
         description="Manage your profile and account security."
       />

@@ -26,44 +26,28 @@ export const clientNavLinks = [
     icon: IconLayoutDashboard,
   },
   {
-    label: "Saved Listings",
-    slug: "/saved",
-    icon: IconBookmark,
+    label: "Listings",
+    icon: IconBuildingSkyscraper,
+    children: [
+      { label: "Saved Listings", slug: "/saved", icon: IconBookmark },
+      { label: "Applications", slug: "/applications", icon: IconClipboardList },
+      { label: "Bookings", slug: "/bookings", icon: IconCalendar },
+      { label: "Property Tours", slug: "/tours", icon: IconHomeDot },
+      { label: "Agreements", slug: "/agreements", icon: IconFileText },
+      {
+        label: "Rental Payments",
+        slug: "/rental-payments",
+        icon: IconCurrencyNaira,
+      },
+    ],
   },
   {
-    label: "My Applications",
-    slug: "/applications",
-    icon: IconClipboardList,
-  },
-  {
-    label: "My Bookings",
-    slug: "/bookings",
-    icon: IconCalendar,
-  },
-  {
-    label: "Property Tours",
-    slug: "/tours",
-    icon: IconHomeDot,
-  },
-  {
-    label: "Agreements",
-    slug: "/agreements",
-    icon: IconFileText,
-  },
-  {
-    label: "Rental Payments",
-    slug: "/rental-payments",
-    icon: IconCurrencyNaira,
-  },
-  {
-    label: "FirstKey",
-    slug: "/firstkey",
+    label: "Savings",
     icon: IconPigMoney,
-  },
-  {
-    label: "Wallet",
-    slug: "/wallet",
-    icon: IconWallet,
+    children: [
+      { label: "Sage Nest", slug: "/wallet", icon: IconWallet },
+      { label: "FirstKey", slug: "/firstkey", icon: IconPigMoney },
+    ],
   },
   {
     label: "Notifications",

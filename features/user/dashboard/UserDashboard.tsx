@@ -336,207 +336,212 @@ export function UserDashboard() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-2">
-            {loading ? (
-              Array.from({ length: 2 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <Skeleton className="size-9 rounded-lg" />
-                  <div className="flex-1 space-y-1">
-                    <Skeleton className="h-4 w-1/3" />
-                    <Skeleton className="h-3 w-1/4" />
+            {loading
+              ? Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <Skeleton className="size-9 rounded-lg" />
+                    <div className="flex-1 space-y-1">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-3 w-1/4" />
+                    </div>
+                    <Skeleton className="h-5 w-16" />
                   </div>
-                  <Skeleton className="h-5 w-16" />
-                </div>
-              ))
-            ) : (
-              stats?.savings.plans.map((plan) => (
-                <Link key={plan.id} href={`/firstkey/${plan.id}`}>
-                  <div className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/40">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-                        <IconPigMoney className="size-4 text-emerald-600 dark:text-emerald-400" />
+                ))
+              : stats?.savings.plans.map((plan) => (
+                  <Link key={plan.id} href={`/firstkey/${plan.id}`}>
+                    <div className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/40">
+                      <div className="flex items-center gap-3">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                          <IconPigMoney className="size-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {plan.planName ?? "FirstKey Plan"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {fmt(plan.totalDeposited + plan.interestEarned)}{" "}
+                            saved
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          {plan.planName ?? "FirstKey Plan"}
+                      <div className="text-right">
+                        <p className="text-xs font-medium text-emerald-600">
+                          +{fmt(plan.interestEarned)} interest
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {fmt(plan.totalDeposited + plan.interestEarned)} saved
-                        </p>
+                        <Badge
+                          variant="outline"
+                          className={`mt-0.5 text-[10px] ${
+                            plan.status === "ACTIVE"
+                              ? "border-emerald-200 text-emerald-700"
+                              : plan.status === "MATURED"
+                                ? "border-blue-200 text-blue-700"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {plan.status}
+                        </Badge>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs font-medium text-emerald-600">
-                        +{fmt(plan.interestEarned)} interest
-                      </p>
-                      <Badge
-                        variant="outline"
-                        className={`mt-0.5 text-[10px] ${
-                          plan.status === "ACTIVE"
-                            ? "border-emerald-200 text-emerald-700"
-                            : plan.status === "MATURED"
-                              ? "border-blue-200 text-blue-700"
-                              : "text-muted-foreground"
-                        }`}
-                      >
-                        {plan.status}
-                      </Badge>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
+                  </Link>
+                ))}
           </CardContent>
         </Card>
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Recent Applications */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between border-b">
-            <CardTitle className="text-base">Recent Applications</CardTitle>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/applications">View all</Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {loading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex gap-3">
-                  <Skeleton className="size-12 flex-shrink-0 rounded-lg" />
-                  <div className="flex-1 space-y-1.5">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
+        <div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between border-b">
+              <CardTitle className="text-base">Recent Applications</CardTitle>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/applications">View all</Link>
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex gap-3">
+                    <Skeleton className="size-12 flex-shrink-0 rounded-lg" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
                   </div>
+                ))
+              ) : !stats?.recentApplications.length ? (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  No applications yet.{" "}
+                  <Link href="/" className="text-primary hover:underline">
+                    Browse listings
+                  </Link>
                 </div>
-              ))
-            ) : !stats?.recentApplications.length ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                No applications yet.{" "}
-                <Link href="/" className="text-primary hover:underline">
-                  Browse listings
-                </Link>
-              </div>
-            ) : (
-              stats.recentApplications.map((app) => {
-                const badge = APP_STATUS[app.status] ?? {
-                  label: app.status,
-                  className: "",
-                }
-                return (
-                  <div
-                    key={app.id}
-                    className="flex items-center gap-3 rounded-lg border p-3"
-                  >
-                    <div className="relative size-12 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-                      {app.listing.photos[0] && (
-                        <Image
-                          src={app.listing.photos[0]}
-                          alt={app.listing.title}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
-                        {app.listing.title}
-                      </p>
-                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <IconMapPin className="size-3" />
-                        {app.listing.area}, {app.listing.state}
-                      </p>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`flex-shrink-0 text-xs ${badge.className}`}
+              ) : (
+                stats.recentApplications.map((app) => {
+                  const badge = APP_STATUS[app.status] ?? {
+                    label: app.status,
+                    className: "",
+                  }
+                  return (
+                    <div
+                      key={app.id}
+                      className="flex items-center gap-3 rounded-lg border p-3"
                     >
-                      {badge.label}
-                    </Badge>
-                  </div>
-                )
-              })
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Bookings */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between border-b">
-            <CardTitle className="text-base">Recent Bookings</CardTitle>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/bookings">View all</Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {loading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex gap-3">
-                  <Skeleton className="size-12 flex-shrink-0 rounded-lg" />
-                  <div className="flex-1 space-y-1.5">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              ))
-            ) : !stats?.recentBookings.length ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                No bookings yet.{" "}
-                <Link href="/" className="text-primary hover:underline">
-                  Find a shortlet
-                </Link>
-              </div>
-            ) : (
-              stats.recentBookings.map((booking) => {
-                const badge = BOOKING_STATUS[booking.status] ?? {
-                  label: booking.status,
-                  className: "",
-                }
-                return (
-                  <div
-                    key={booking.id}
-                    className="flex items-center gap-3 rounded-lg border p-3"
-                  >
-                    <div className="relative size-12 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
-                      {booking.listing.photos[0] && (
-                        <Image
-                          src={booking.listing.photos[0]}
-                          alt={booking.listing.title}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
-                        {booking.listing.title}
-                      </p>
-                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <IconCalendar className="size-3" />
-                        {new Date(booking.checkIn).toLocaleDateString("en-NG", {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                        {" — "}
-                        {new Date(booking.checkOut).toLocaleDateString(
-                          "en-NG",
-                          { day: "numeric", month: "short" }
+                      <div className="relative size-12 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+                        {app.listing.photos[0] && (
+                          <Image
+                            src={app.listing.photos[0]}
+                            alt={app.listing.title}
+                            fill
+                            className="object-cover"
+                          />
                         )}
-                        {" · "}
-                        {booking.nights} night{booking.nights > 1 ? "s" : ""}
-                      </p>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
+                          {app.listing.title}
+                        </p>
+                        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <IconMapPin className="size-3" />
+                          {app.listing.area}, {app.listing.state}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`flex-shrink-0 text-xs ${badge.className}`}
+                      >
+                        {badge.label}
+                      </Badge>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`flex-shrink-0 text-xs ${badge.className}`}
-                    >
-                      {badge.label}
-                    </Badge>
+                  )
+                })
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <div>
+          {/* Recent Bookings */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between border-b">
+              <CardTitle className="text-base">Recent Bookings</CardTitle>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/bookings">View all</Link>
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex gap-3">
+                    <Skeleton className="size-12 flex-shrink-0 rounded-lg" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
                   </div>
-                )
-              })
-            )}
-          </CardContent>
-        </Card>
+                ))
+              ) : !stats?.recentBookings.length ? (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  No bookings yet.{" "}
+                  <Link href="/" className="text-primary hover:underline">
+                    Find a shortlet
+                  </Link>
+                </div>
+              ) : (
+                stats.recentBookings.map((booking) => {
+                  const badge = BOOKING_STATUS[booking.status] ?? {
+                    label: booking.status,
+                    className: "",
+                  }
+                  return (
+                    <div
+                      key={booking.id}
+                      className="flex items-center gap-3 rounded-lg border p-3"
+                    >
+                      <div className="relative size-12 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+                        {booking.listing.photos[0] && (
+                          <Image
+                            src={booking.listing.photos[0]}
+                            alt={booking.listing.title}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
+                          {booking.listing.title}
+                        </p>
+                        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <IconCalendar className="size-3" />
+                          {new Date(booking.checkIn).toLocaleDateString(
+                            "en-NG",
+                            {
+                              day: "numeric",
+                              month: "short",
+                            }
+                          )}
+                          {" — "}
+                          {new Date(booking.checkOut).toLocaleDateString(
+                            "en-NG",
+                            { day: "numeric", month: "short" }
+                          )}
+                          {" · "}
+                          {booking.nights} night{booking.nights > 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`flex-shrink-0 text-xs ${badge.className}`}
+                      >
+                        {badge.label}
+                      </Badge>
+                    </div>
+                  )
+                })
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )

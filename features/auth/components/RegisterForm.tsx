@@ -31,7 +31,6 @@ import {
 import { PasswordStrength } from "./PasswordStrength"
 import { cn } from "@/lib/utils"
 import api from "@/lib/api"
-import { useAuth } from "@/store/useAuth"
 
 const registerSchema = z
   .object({
@@ -86,7 +85,6 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const router = useRouter()
-  const setUser = useAuth((s) => s.setUser)
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
@@ -117,9 +115,8 @@ export function RegisterForm() {
         confirmPassword: values.confirmPassword,
         acceptTerms: values.terms,
       })
-      setUser(data.user)
-      toast.success(data.message ?? "Account created!")
-      router.push("/onboarding")
+      toast.success(data.message ?? "Account created! Check your email.")
+      router.push(`/verify-email?email=${encodeURIComponent(values.email)}`)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error(

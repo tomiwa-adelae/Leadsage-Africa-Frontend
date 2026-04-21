@@ -18,6 +18,7 @@ import { toast } from "sonner"
 
 import { fetchData, postData } from "@/lib/api"
 import { PageHeader } from "@/components/PageHeader"
+import { PinModal } from "@/components/PinModal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -99,6 +100,7 @@ export function RentalPayments() {
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState<string | null>(null)
   const [walletBalance, setWalletBalance] = useState<number | null>(null)
+  const [pinTarget, setPinTarget] = useState<{ paymentId: string; amount: number } | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -132,16 +134,21 @@ export function RentalPayments() {
     }
   }
 
-  async function handlePayWallet(paymentId: string, amount: number) {
+  function handlePayWallet(paymentId: string, amount: number) {
     if (walletBalance !== null && walletBalance < amount) {
-      toast.error(
-        `Insufficient wallet balance. You have ${fmt(walletBalance)}.`
-      )
+      toast.error(`Insufficient wallet balance. You have ${fmt(walletBalance)}.`)
       return
     }
+    setPinTarget({ paymentId, amount })
+  }
+
+  async function executeWalletPayment(pin: string) {
+    if (!pinTarget) return
+    const { paymentId } = pinTarget
+    setPinTarget(null)
     setPaying(paymentId)
     try {
-      await postData(`/wallet/pay/rent/${paymentId}`, {})
+      await postData(`/wallet/pay/rent/${paymentId}`, { pin })
       toast.success("Paid from wallet — funds held in escrow for landlord")
       load()
     } catch (err: any) {
@@ -340,6 +347,13 @@ export function RentalPayments() {
           ))}
         </>
       )}
+
+      <PinModal
+        open={!!pinTarget}
+        description="Enter your PIN to pay from wallet."
+        onConfirm={executeWalletPayment}
+        onCancel={() => setPinTarget(null)}
+      />
     </div>
   )
 }

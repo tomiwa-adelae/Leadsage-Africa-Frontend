@@ -10,6 +10,7 @@ import {
   IconBuilding,
   IconWallet,
   IconCreditCard,
+  IconCalendar,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -19,6 +20,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import type { SavingsPlan } from "./FirstKeyPage"
 
@@ -36,6 +49,20 @@ const fmt = (n: number) =>
     maximumFractionDigits: 0,
   }).format(n)
 
+const ordinal = (n: number) => {
+  const s = ["th", "st", "nd", "rd"]
+  const v = n % 100
+  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
+}
+
+const NIGERIAN_STATES = [
+  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue",
+  "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu",
+  "FCT - Abuja", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina",
+  "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo",
+  "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
+]
+
 const ACADEMIC_LEVELS = ["100", "200", "300", "400", "500"]
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -46,7 +73,11 @@ const FREQUENCIES: { value: Frequency; label: string }[] = [
   { value: "CUSTOM", label: "Custom" },
 ]
 
-const PAYMENT_METHODS: { value: PaymentMethod; label: string; icon: React.ElementType }[] = [
+const PAYMENT_METHODS: {
+  value: PaymentMethod
+  label: string
+  icon: React.ElementType
+}[] = [
   { value: "WALLET", label: "Leadsage Wallet", icon: IconWallet },
   { value: "CARD", label: "Debit Card", icon: IconCreditCard },
   { value: "BANK_TRANSFER", label: "Bank Transfer", icon: IconBuilding },
@@ -69,7 +100,7 @@ function SelectChip({
         "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
         selected
           ? "border-[#1a3d2b] bg-[#1a3d2b] text-white dark:border-green-500 dark:bg-green-800"
-          : "hover:border-[#1a3d2b]/40",
+          : "hover:border-[#1a3d2b]/40"
       )}
     >
       {children}
@@ -117,7 +148,9 @@ export function SavingsPlanSettings({ id }: { id: string }) {
     }
   }, [id])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+  }, [load])
 
   const handleSave = async () => {
     setSaving(true)
@@ -154,7 +187,7 @@ export function SavingsPlanSettings({ id }: { id: string }) {
   if (!plan) return null
 
   return (
-    <div className="mx-auto max-w-lg space-y-4">
+    <div className="space-y-4">
       <PageHeader
         back
         title="Plan Settings"
@@ -163,7 +196,7 @@ export function SavingsPlanSettings({ id }: { id: string }) {
 
       {/* Plan name */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader className="border-b">
           <CardTitle className="text-sm">Plan Name</CardTitle>
         </CardHeader>
         <CardContent>
@@ -177,7 +210,7 @@ export function SavingsPlanSettings({ id }: { id: string }) {
 
       {/* Academic info */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader className="border-b">
           <CardTitle className="text-sm">Academic Level</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -208,7 +241,7 @@ export function SavingsPlanSettings({ id }: { id: string }) {
 
       {/* Contribution frequency */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader className="border-b">
           <CardTitle className="flex items-center gap-2 text-sm">
             <IconRepeat className="size-4" />
             Contribution Frequency
@@ -240,7 +273,7 @@ export function SavingsPlanSettings({ id }: { id: string }) {
                       "flex-1 rounded-lg border py-1.5 text-xs font-medium transition-colors",
                       preferredDay === i + 1
                         ? "border-[#1a3d2b] bg-[#1a3d2b] text-white"
-                        : "hover:border-[#1a3d2b]/40",
+                        : "hover:border-[#1a3d2b]/40"
                     )}
                   >
                     {day}
@@ -253,20 +286,56 @@ export function SavingsPlanSettings({ id }: { id: string }) {
           {frequency === "MONTHLY" && (
             <div className="space-y-1">
               <Label className="text-xs">Preferred day of month</Label>
-              <Input
-                type="number"
-                min={1}
-                max={28}
-                value={preferredDay ?? ""}
-                onChange={(e) => setPreferredDay(parseInt(e.target.value))}
-                placeholder="e.g. 1"
-                className="max-w-xs"
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className={cn(
+                      "flex h-11 items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors hover:border-[#1a3d2b]/40",
+                      preferredDay
+                        ? "border-[#1a3d2b] text-foreground"
+                        : "border-border text-muted-foreground"
+                    )}
+                  >
+                    <IconCalendar className="size-4 text-[#1a3d2b] dark:text-green-400" />
+                    {preferredDay
+                      ? `${ordinal(preferredDay)} of every month`
+                      : "Pick a day"}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-3" align="start">
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    Select the day contributions are taken
+                  </p>
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => setPreferredDay(day)}
+                        className={cn(
+                          "flex size-8 items-center justify-center rounded-md text-xs font-medium transition-colors",
+                          preferredDay === day
+                            ? "bg-[#1a3d2b] text-white dark:bg-green-700"
+                            : "hover:bg-muted"
+                        )}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-[10px] text-muted-foreground">
+                    Days 29–31 are skipped in shorter months
+                  </p>
+                </PopoverContent>
+              </Popover>
             </div>
           )}
 
           <div className="space-y-1">
-            <Label className="text-xs">Amount per {frequency.toLowerCase()} (₦)</Label>
+            <Label className="text-xs">
+              Amount per {frequency.toLowerCase()} (₦)
+            </Label>
             <Input
               type="number"
               min={100}
@@ -290,7 +359,7 @@ export function SavingsPlanSettings({ id }: { id: string }) {
 
       {/* Savings target */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader className="border-b">
           <CardTitle className="text-sm">Savings Target</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -307,19 +376,28 @@ export function SavingsPlanSettings({ id }: { id: string }) {
           </div>
           <div className="space-y-1">
             <Label className="text-xs">Rental location</Label>
-            <Input
+            <Select
               value={rentalLocation}
-              onChange={(e) => setRentalLocation(e.target.value)}
-              placeholder="e.g. Lagos Island"
-              className="max-w-sm"
-            />
+              onValueChange={setRentalLocation}
+            >
+              <SelectTrigger className="max-w-sm">
+                <SelectValue placeholder="Select a state" />
+              </SelectTrigger>
+              <SelectContent>
+                {NIGERIAN_STATES.map((state) => (
+                  <SelectItem key={state} value={state}>
+                    {state}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
 
       {/* Payment method */}
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader className="border-b">
           <CardTitle className="text-sm">Payment Method</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -334,7 +412,7 @@ export function SavingsPlanSettings({ id }: { id: string }) {
                   "flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-all",
                   paymentMethod === m.value
                     ? "border-[#1a3d2b] bg-[#1a3d2b]/5 dark:border-green-500"
-                    : "border-border hover:border-[#1a3d2b]/40",
+                    : "border-border hover:border-[#1a3d2b]/40"
                 )}
               >
                 <Icon className="size-4 text-[#1a3d2b] dark:text-green-400" />

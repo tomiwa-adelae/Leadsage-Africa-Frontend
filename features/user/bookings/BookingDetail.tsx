@@ -31,6 +31,7 @@ import {
 import { toast } from "sonner"
 
 import { fetchData, deleteData, postData } from "@/lib/api"
+import { PinModal } from "@/components/PinModal"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -192,6 +193,7 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [paying, setPaying] = useState(false)
+  const [showPinModal, setShowPinModal] = useState(false)
   const [walletBalance, setWalletBalance] = useState<number | null>(null)
 
   const load = useCallback(async () => {
@@ -224,15 +226,21 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
     }
   }
 
-  async function handlePayWallet() {
+  function handlePayWallet() {
     if (!booking) return
     if (walletBalance !== null && walletBalance < booking.totalPrice) {
       toast.error(`Insufficient wallet balance. You have ${fmt(walletBalance)}.`)
       return
     }
+    setShowPinModal(true)
+  }
+
+  async function executeWalletPayment(pin: string) {
+    if (!booking) return
+    setShowPinModal(false)
     setPaying(true)
     try {
-      const res = await postData<{ status: string }>(`/wallet/pay/booking/${bookingId}`, {})
+      const res = await postData<{ status: string }>(`/wallet/pay/booking/${bookingId}`, { pin })
       toast.success(
         res.status === "CONFIRMED"
           ? "Paid and booking confirmed!"
@@ -675,6 +683,13 @@ export function BookingDetail({ bookingId }: { bookingId: string }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PinModal
+        open={showPinModal}
+        description="Enter your PIN to pay from wallet."
+        onConfirm={executeWalletPayment}
+        onCancel={() => setShowPinModal(false)}
+      />
     </div>
   )
 }

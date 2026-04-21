@@ -361,7 +361,7 @@ function LocationStep({
           id="state"
           value={data.state}
           onChange={(e) => onChange({ state: e.target.value })}
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
+          className="flex h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
         >
           <option value="">Select a state</option>
           {NIGERIAN_STATES.map((s) => (
@@ -842,12 +842,12 @@ export function OnboardingWizard() {
   const stepNum = isDone ? totalContentSteps : step + 1
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="container flex min-h-screen flex-col bg-background">
       {/* ── Header ── */}
       {!isDone && (
         <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex items-center justify-between py-4">
-            <Logo />
+          <div className="flex items-center justify-between py-4">
+            <Logo color="green" />
             <span className="text-sm text-muted-foreground">
               <span className="font-medium text-foreground">{stepLabel}</span>
               {" · "}Step {stepNum} of {totalContentSteps}

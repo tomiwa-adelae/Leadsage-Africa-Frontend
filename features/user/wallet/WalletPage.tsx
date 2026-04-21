@@ -16,6 +16,8 @@ import { toast } from "sonner"
 
 import { fetchData, postData } from "@/lib/api"
 import { PageHeader } from "@/components/PageHeader"
+import { SetPinModal } from "@/components/SetPinModal"
+import { PinModal } from "@/components/PinModal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -48,6 +50,7 @@ interface WalletAccount {
   virtualBankName: string | null
   availableBalance: number
   pendingBalance: number
+  transactionPinSet: boolean
 }
 
 interface WalletTx {
@@ -141,6 +144,16 @@ export function WalletPage() {
   const [verifyingBank, setVerifyingBank] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
 
+  // PIN modals
+  const [showSetPin, setShowSetPin] = useState(false)
+  const [showPinModal, setShowPinModal] = useState(false)
+  const [pendingWithdrawData, setPendingWithdrawData] = useState<{
+    amount: number
+    bankAccountNumber: string
+    bankCode: string
+    bankAccountName: string
+  } | null>(null)
+
   const load = useCallback(async () => {
     setLoading(true)
     try {
@@ -150,6 +163,7 @@ export function WalletPage() {
       ])
       setWallet(w)
       setTxs(t)
+      if (!w.transactionPinSet) setShowSetPin(true)
     } catch {
       toast.error("Failed to load wallet")
     } finally {
@@ -211,7 +225,7 @@ export function WalletPage() {
     }
   }
 
-  async function handleWithdraw() {
+  function handleWithdraw() {
     const amount = parseFloat(withdrawForm.amount)
     if (
       !amount ||
@@ -222,22 +236,28 @@ export function WalletPage() {
       toast.error("Please complete all fields and verify your account")
       return
     }
+    setPendingWithdrawData({
+      amount,
+      bankAccountNumber: withdrawForm.accountNumber,
+      bankCode: withdrawForm.bankCode,
+      bankAccountName: withdrawForm.accountName,
+    })
+    setShowWithdraw(false)
+    setShowPinModal(true)
+  }
+
+  async function executeWithdraw(pin: string) {
+    if (!pendingWithdrawData) return
+    setShowPinModal(false)
     setWithdrawing(true)
     try {
       const res = await postData<{ message: string }>("/wallet/withdraw", {
-        amount,
-        bankAccountNumber: withdrawForm.accountNumber,
-        bankCode: withdrawForm.bankCode,
-        bankAccountName: withdrawForm.accountName,
+        ...pendingWithdrawData,
+        pin,
       })
       toast.success(res.message)
-      setShowWithdraw(false)
-      setWithdrawForm({
-        amount: "",
-        bankCode: "",
-        accountNumber: "",
-        accountName: "",
-      })
+      setWithdrawForm({ amount: "", bankCode: "", accountNumber: "", accountName: "" })
+      setPendingWithdrawData(null)
       load()
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "Withdrawal failed")
@@ -495,6 +515,26 @@ export function WalletPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Set PIN — blocking on first load */}
+      <SetPinModal
+        open={showSetPin}
+        onSuccess={() => {
+          setShowSetPin(false)
+          setWallet((w) => w ? { ...w, transactionPinSet: true } : w)
+        }}
+      />
+
+      {/* PIN confirmation before withdrawal */}
+      <PinModal
+        open={showPinModal}
+        description="Enter your PIN to confirm this withdrawal."
+        onConfirm={executeWithdraw}
+        onCancel={() => {
+          setShowPinModal(false)
+          setPendingWithdrawData(null)
+        }}
+      />
 
       {/* Withdraw Dialog */}
       <Dialog open={showWithdraw} onOpenChange={setShowWithdraw}>

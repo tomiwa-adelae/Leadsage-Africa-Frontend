@@ -14,6 +14,8 @@ const PUBLIC_ROUTES = [
   "/auth/forgot-password",
   "/auth/verify-code",
   "/auth/set-new-password",
+  "/auth/verify-email",
+  "/auth/resend-email-verification",
   "/auth/refresh", // never re-intercept the refresh endpoint itself
 ]
 

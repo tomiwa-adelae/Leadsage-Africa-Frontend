@@ -509,13 +509,15 @@ export function SavingsPlanDetail({ id }: { id: string }) {
         fetchData<PlanDetail>(`/savings/${id}`),
         fetchData<{ availableBalance: number }>("/wallet").catch(() => null),
         fetchData<{ transactions: Transaction[]; total: number }>(
-          `/savings/${id}/transactions?page=1&limit=${TX_PAGE_SIZE}`,
+          `/savings/${id}/transactions?page=1&limit=${TX_PAGE_SIZE}`
         ).catch(() => null),
       ])
       setPlan(data)
       if (wallet) setWalletBalance(wallet.availableBalance)
       if (txData) {
-        setPlan((prev) => prev ? { ...prev, transactions: txData.transactions } : prev)
+        setPlan((prev) =>
+          prev ? { ...prev, transactions: txData.transactions } : prev
+        )
         setTxTotal(txData.total)
         setTxPage(1)
       }
@@ -531,11 +533,17 @@ export function SavingsPlanDetail({ id }: { id: string }) {
     setTxLoading(true)
     try {
       const nextPage = txPage + 1
-      const data = await fetchData<{ transactions: Transaction[]; total: number }>(
-        `/savings/${id}/transactions?page=${nextPage}&limit=${TX_PAGE_SIZE}`,
-      )
+      const data = await fetchData<{
+        transactions: Transaction[]
+        total: number
+      }>(`/savings/${id}/transactions?page=${nextPage}&limit=${TX_PAGE_SIZE}`)
       setPlan((prev) =>
-        prev ? { ...prev, transactions: [...prev.transactions, ...data.transactions] } : prev,
+        prev
+          ? {
+              ...prev,
+              transactions: [...prev.transactions, ...data.transactions],
+            }
+          : prev
       )
       setTxPage(nextPage)
       setTxTotal(data.total)
@@ -746,7 +754,7 @@ export function SavingsPlanDetail({ id }: { id: string }) {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Account number</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-semibold tracking-wider">
+                  <span className="font-semibold tracking-wider">
                     {plan.nuban}
                   </span>
                   <button onClick={copyNuban}>

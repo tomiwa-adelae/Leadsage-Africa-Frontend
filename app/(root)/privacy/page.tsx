@@ -30,7 +30,7 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="container max-w-4xl py-12 lg:py-16">
+    <div className="container py-12 lg:py-16">
       {/* Header */}
       <div className="mb-10 space-y-2">
         <p className="text-sm font-medium text-primary">Legal</p>
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           Effective date: {EFFECTIVE_DATE} &nbsp;·&nbsp; Last updated:{" "}
           {EFFECTIVE_DATE}
         </p>
-        <p className="mt-4 text-base text-muted-foreground leading-relaxed">
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground">
           LeadSage Africa ("LeadSage", "we", "our", or "us") respects your
           privacy and is committed to protecting your personal data in
           accordance with the{" "}
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
         {/* Table of contents — sticky on desktop */}
         <aside className="hidden lg:block">
           <div className="sticky top-8 space-y-1">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Contents
             </p>
             {sections.map((s) => (
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
         {/* Body */}
         <div className="space-y-10 text-sm leading-relaxed text-muted-foreground">
           {/* 1 */}
-          <section id="intro" className="space-y-3 scroll-mt-8">
+          <section id="intro" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               1. Introduction
             </h2>
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 2 */}
-          <section id="scope" className="space-y-3 scroll-mt-8">
+          <section id="scope" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               2. Scope
             </h2>
@@ -125,14 +125,14 @@ export default function PrivacyPage() {
           </section>
 
           {/* 3 */}
-          <section id="collect" className="space-y-3 scroll-mt-8">
+          <section id="collect" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               3. Information We Collect
             </h2>
             <p>
-              We collect information you provide directly, information
-              generated through your use of our platform, and information from
-              third parties where permitted by law.
+              We collect information you provide directly, information generated
+              through your use of our platform, and information from third
+              parties where permitted by law.
             </p>
 
             <p className="font-medium text-foreground">
@@ -141,8 +141,8 @@ export default function PrivacyPage() {
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
                 <strong className="text-foreground">Identity data</strong> —
-                full name, username, email address, phone number, date of
-                birth, gender, profile photo
+                full name, username, email address, phone number, date of birth,
+                gender, profile photo
               </li>
               <li>
                 <strong className="text-foreground">Address data</strong> —
@@ -200,9 +200,7 @@ export default function PrivacyPage() {
                 click-through data)
               </li>
               <li>Authentication tokens and session cookies</li>
-              <li>
-                Geolocation data (city/region level, if you permit it)
-              </li>
+              <li>Geolocation data (city/region level, if you permit it)</li>
             </ul>
 
             <p className="font-medium text-foreground">
@@ -217,14 +215,12 @@ export default function PrivacyPage() {
                 BVN/NIN verification results from our identity verification
                 partner (Prembly)
               </li>
-              <li>
-                Payment confirmation data from Paystack and Anchor BaaS
-              </li>
+              <li>Payment confirmation data from Paystack and Anchor BaaS</li>
             </ul>
           </section>
 
           {/* 4 */}
-          <section id="use" className="space-y-3 scroll-mt-8">
+          <section id="use" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               4. How We Use Your Information
             </h2>
@@ -236,8 +232,8 @@ export default function PrivacyPage() {
                 address, and authenticating your identity
               </li>
               <li>
-                <strong className="text-foreground">Service delivery</strong>{" "}
-                — enabling property searches, applications, bookings, rent
+                <strong className="text-foreground">Service delivery</strong> —
+                enabling property searches, applications, bookings, rent
                 payments, and wallet transactions
               </li>
               <li>
@@ -255,10 +251,10 @@ export default function PrivacyPage() {
                 — enabling SageNest Savings and other financial services
               </li>
               <li>
-                <strong className="text-foreground">Communications</strong>{" "}
-                — sending transactional emails (booking confirmations, payment
-                receipts, OTP codes), service updates, and, where you have
-                opted in, marketing messages
+                <strong className="text-foreground">Communications</strong> —
+                sending transactional emails (booking confirmations, payment
+                receipts, OTP codes), service updates, and, where you have opted
+                in, marketing messages
               </li>
               <li>
                 <strong className="text-foreground">
@@ -268,8 +264,8 @@ export default function PrivacyPage() {
                 and personalise your experience
               </li>
               <li>
-                <strong className="text-foreground">Legal compliance</strong>{" "}
-                — meeting our obligations under Nigerian law, including tax
+                <strong className="text-foreground">Legal compliance</strong> —
+                meeting our obligations under Nigerian law, including tax
                 reporting and responding to lawful requests from authorities
               </li>
             </ul>
@@ -280,8 +276,8 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                <strong className="text-foreground">Consent</strong> — where
-                you have expressly agreed (e.g. marketing emails, geolocation)
+                <strong className="text-foreground">Consent</strong> — where you
+                have expressly agreed (e.g. marketing emails, geolocation)
               </li>
               <li>
                 <strong className="text-foreground">
@@ -290,8 +286,8 @@ export default function PrivacyPage() {
                 — to fulfil our obligations to you as a user of our platform
               </li>
               <li>
-                <strong className="text-foreground">Legal obligation</strong>{" "}
-                — KYC/AML compliance, tax reporting, and lawful orders
+                <strong className="text-foreground">Legal obligation</strong> —
+                KYC/AML compliance, tax reporting, and lawful orders
               </li>
               <li>
                 <strong className="text-foreground">
@@ -304,13 +300,13 @@ export default function PrivacyPage() {
           </section>
 
           {/* 5 */}
-          <section id="sharing" className="space-y-3 scroll-mt-8">
+          <section id="sharing" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               5. Information Sharing & Disclosure
             </h2>
             <p>
-              We do not sell your personal data. We share your information
-              only in the following circumstances:
+              We do not sell your personal data. We share your information only
+              in the following circumstances:
             </p>
             <ul className="list-disc space-y-2 pl-5">
               <li>
@@ -322,16 +318,15 @@ export default function PrivacyPage() {
                 facilitate the transaction
               </li>
               <li>
-                <strong className="text-foreground">Service providers</strong>{" "}
-                — trusted third parties who process data on our behalf
-                (payment processors, cloud storage, email delivery, identity
-                verification). They are bound by data processing agreements
-                and may not use your data for their own purposes.
+                <strong className="text-foreground">Service providers</strong> —
+                trusted third parties who process data on our behalf (payment
+                processors, cloud storage, email delivery, identity
+                verification). They are bound by data processing agreements and
+                may not use your data for their own purposes.
               </li>
               <li>
                 <strong className="text-foreground">Financial partners</strong>{" "}
-                — licensed financial institutions holding SageNest Savings
-                funds
+                — licensed financial institutions holding SageNest Savings funds
               </li>
               <li>
                 <strong className="text-foreground">
@@ -344,21 +339,20 @@ export default function PrivacyPage() {
               <li>
                 <strong className="text-foreground">Business transfers</strong>{" "}
                 — in the event of a merger, acquisition, or asset sale, your
-                data may be transferred as part of that transaction. You will
-                be notified of any change in ownership.
+                data may be transferred as part of that transaction. You will be
+                notified of any change in ownership.
               </li>
             </ul>
           </section>
 
           {/* 6 */}
-          <section id="international" className="space-y-3 scroll-mt-8">
+          <section id="international" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               6. International Data Transfers
             </h2>
             <p>
               Where your data is transferred outside Nigeria (for example, to
-              cloud infrastructure or third-party service providers), we
-              ensure:
+              cloud infrastructure or third-party service providers), we ensure:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>Adequate data protection safeguards are in place</li>
@@ -366,38 +360,36 @@ export default function PrivacyPage() {
                 Full compliance with NDPR/NDPA requirements for cross-border
                 data transfers
               </li>
-              <li>
-                Data processing agreements with all recipient parties
-              </li>
+              <li>Data processing agreements with all recipient parties</li>
             </ul>
           </section>
 
           {/* 7 */}
-          <section id="kyc" className="space-y-3 scroll-mt-8">
+          <section id="kyc" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               7. KYC & Identity Verification
             </h2>
             <p>
               To comply with Nigerian financial regulations and to prevent
-              fraud, we are required to verify the identity of users who
-              access financial features (wallet, savings, withdrawals).
+              fraud, we are required to verify the identity of users who access
+              financial features (wallet, savings, withdrawals).
             </p>
             <p>
               <strong className="text-foreground">
                 Bank Verification Number (BVN):
               </strong>{" "}
               Your BVN is submitted to our KYC partner (Prembly / Anchor) for
-              verification. We do not store your raw BVN in plain text. The
-              BVN is used solely for identity matching and is not shared for
-              any commercial purpose.
+              verification. We do not store your raw BVN in plain text. The BVN
+              is used solely for identity matching and is not shared for any
+              commercial purpose.
             </p>
             <p>
               <strong className="text-foreground">
                 National Identification Number (NIN):
               </strong>{" "}
-              Landlords are required to provide their NIN during onboarding
-              for identity verification. NIN data is submitted to our
-              verification partner and is handled under strict confidentiality.
+              Landlords are required to provide their NIN during onboarding for
+              identity verification. NIN data is submitted to our verification
+              partner and is handled under strict confidentiality.
             </p>
             <p>
               Both BVN and NIN data are encrypted at rest and in transit. We
@@ -407,7 +399,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 8 */}
-          <section id="financial" className="space-y-3 scroll-mt-8">
+          <section id="financial" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               8. Financial & Payment Data
             </h2>
@@ -425,45 +417,43 @@ export default function PrivacyPage() {
               balance for display purposes.
             </p>
             <p>
-              Your 4-digit wallet transaction PIN is stored as a bcrypt hash.
-              We cannot retrieve or view your PIN. If you forget your PIN,
-              you must reset it using a verified OTP sent to your registered
-              email.
+              Your 4-digit wallet transaction PIN is stored as a bcrypt hash. We
+              cannot retrieve or view your PIN. If you forget your PIN, you must
+              reset it using a verified OTP sent to your registered email.
             </p>
             <p>
               Bank account details you provide for withdrawals are used solely
-              to process the requested transfer and are not retained beyond
-              what is necessary for that purpose and applicable record-keeping
+              to process the requested transfer and are not retained beyond what
+              is necessary for that purpose and applicable record-keeping
               requirements.
             </p>
           </section>
 
           {/* 9 */}
-          <section id="cookies" className="space-y-3 scroll-mt-8">
+          <section id="cookies" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               9. Cookies & Tracking
             </h2>
-            <p>We use the following types of cookies and similar technologies:</p>
+            <p>
+              We use the following types of cookies and similar technologies:
+            </p>
             <ul className="list-disc space-y-2 pl-5">
               <li>
                 <strong className="text-foreground">
                   Strictly necessary cookies
                 </strong>{" "}
-                — required for authentication (access token, refresh token)
-                and session management. These cannot be disabled.
+                — required for authentication (access token, refresh token) and
+                session management. These cannot be disabled.
               </li>
               <li>
-                <strong className="text-foreground">
-                  Functional cookies
-                </strong>{" "}
-                — remember your preferences (e.g. dark mode, saved filters)
-                and personalise content.
+                <strong className="text-foreground">Functional cookies</strong>{" "}
+                — remember your preferences (e.g. dark mode, saved filters) and
+                personalise content.
               </li>
               <li>
-                <strong className="text-foreground">Analytics cookies</strong>{" "}
-                — help us understand how you use our platform so we can
-                improve it. These may be disabled without affecting core
-                functionality.
+                <strong className="text-foreground">Analytics cookies</strong> —
+                help us understand how you use our platform so we can improve
+                it. These may be disabled without affecting core functionality.
               </li>
             </ul>
             <p>
@@ -471,21 +461,21 @@ export default function PrivacyPage() {
               <strong className="text-foreground">
                 httpOnly, secure cookies
               </strong>{" "}
-              — they are not accessible to JavaScript, reducing XSS risk. We
-              do not use third-party advertising cookies. You can control
-              cookies via your browser settings.
+              — they are not accessible to JavaScript, reducing XSS risk. We do
+              not use third-party advertising cookies. You can control cookies
+              via your browser settings.
             </p>
           </section>
 
           {/* 10 */}
-          <section id="retention" className="space-y-3 scroll-mt-8">
+          <section id="retention" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               10. Data Retention
             </h2>
             <p>
-              We retain your personal data for as long as your account is
-              active or as necessary to provide you with our services. When
-              you close your account, we will:
+              We retain your personal data for as long as your account is active
+              or as necessary to provide you with our services. When you close
+              your account, we will:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
@@ -494,17 +484,16 @@ export default function PrivacyPage() {
               </li>
               <li>
                 Retain transaction records, KYC data, and financial logs for a
-                minimum of{" "}
-                <strong className="text-foreground">7 years</strong> as
-                required by Nigerian financial regulations (CBN, FIRS)
+                minimum of <strong className="text-foreground">7 years</strong>{" "}
+                as required by Nigerian financial regulations (CBN, FIRS)
               </li>
               <li>
-                Retain data for fraud prevention and dispute resolution
-                purposes for the duration of the relevant matter
+                Retain data for fraud prevention and dispute resolution purposes
+                for the duration of the relevant matter
               </li>
               <li>
-                Retain data subject to an active legal or regulatory inquiry
-                for the duration of that matter
+                Retain data subject to an active legal or regulatory inquiry for
+                the duration of that matter
               </li>
             </ul>
             <p>
@@ -514,7 +503,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 11 */}
-          <section id="rights" className="space-y-3 scroll-mt-8">
+          <section id="rights" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               11. Your Rights (NDPR/NDPA)
             </h2>
@@ -525,19 +514,19 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc space-y-2 pl-5">
               <li>
-                <strong className="text-foreground">Right of access</strong>{" "}
-                — request a copy of the personal data we hold about you
+                <strong className="text-foreground">Right of access</strong> —
+                request a copy of the personal data we hold about you
               </li>
               <li>
                 <strong className="text-foreground">
                   Right to rectification
                 </strong>{" "}
-                — update or correct inaccurate data via your account settings
-                or by contacting us
+                — update or correct inaccurate data via your account settings or
+                by contacting us
               </li>
               <li>
-                <strong className="text-foreground">Right to erasure</strong>{" "}
-                — request deletion of your personal data, subject to legal
+                <strong className="text-foreground">Right to erasure</strong> —
+                request deletion of your personal data, subject to legal
                 retention requirements
               </li>
               <li>
@@ -547,16 +536,16 @@ export default function PrivacyPage() {
                 — receive your data in a structured, machine-readable format
               </li>
               <li>
-                <strong className="text-foreground">Right to object</strong>{" "}
-                — object to the processing of your data for direct marketing
-                or where we rely on legitimate interests
+                <strong className="text-foreground">Right to object</strong> —
+                object to the processing of your data for direct marketing or
+                where we rely on legitimate interests
               </li>
               <li>
                 <strong className="text-foreground">
                   Right to withdraw consent
                 </strong>{" "}
-                — where processing is based on your consent, you may withdraw
-                it at any time without affecting prior processing
+                — where processing is based on your consent, you may withdraw it
+                at any time without affecting prior processing
               </li>
             </ul>
             <p>
@@ -568,18 +557,18 @@ export default function PrivacyPage() {
                 support@leadsageafrica.com
               </a>
               . We will respond within{" "}
-              <strong className="text-foreground">30 days</strong> in
-              accordance with the NDPR/NDPA.
+              <strong className="text-foreground">30 days</strong> in accordance
+              with the NDPR/NDPA.
             </p>
             <p>
-              You also have the right to lodge a complaint with the Nigeria
-              Data Protection Commission (NDPC) if you believe your rights
-              have been violated.
+              You also have the right to lodge a complaint with the Nigeria Data
+              Protection Commission (NDPC) if you believe your rights have been
+              violated.
             </p>
           </section>
 
           {/* 12 */}
-          <section id="security" className="space-y-3 scroll-mt-8">
+          <section id="security" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               12. Data Security
             </h2>
@@ -588,22 +577,14 @@ export default function PrivacyPage() {
               measures to protect your personal data, including:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
+              <li>Encryption for data at rest and in transit (TLS/HTTPS)</li>
+              <li>bcrypt hashing for passwords, OTPs, and transaction PINs</li>
+              <li>httpOnly, secure cookies for authentication tokens</li>
               <li>
-                Encryption for data at rest and in transit (TLS/HTTPS)
+                JWT-based access token rotation (15-minute expiry) with refresh
+                token reuse detection
               </li>
-              <li>
-                bcrypt hashing for passwords, OTPs, and transaction PINs
-              </li>
-              <li>
-                httpOnly, secure cookies for authentication tokens
-              </li>
-              <li>
-                JWT-based access token rotation (15-minute expiry) with
-                refresh token reuse detection
-              </li>
-              <li>
-                Cloudflare Turnstile CAPTCHA to prevent automated attacks
-              </li>
+              <li>Cloudflare Turnstile CAPTCHA to prevent automated attacks</li>
               <li>
                 Secure servers, firewalls, and role-based access controls
                 limiting internal data access to authorised personnel only
@@ -614,16 +595,16 @@ export default function PrivacyPage() {
               </li>
             </ul>
             <p>
-              Despite these measures, no system is 100% secure, and users
-              share data at their own risk. In the event of a data breach that
-              affects your rights, we will notify you and the NDPC within{" "}
+              Despite these measures, no system is 100% secure, and users share
+              data at their own risk. In the event of a data breach that affects
+              your rights, we will notify you and the NDPC within{" "}
               <strong className="text-foreground">72 hours</strong> of becoming
               aware of the incident.
             </p>
           </section>
 
           {/* 13 */}
-          <section id="third-party" className="space-y-3 scroll-mt-8">
+          <section id="third-party" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               13. Third-Party Services & Links
             </h2>
@@ -648,8 +629,8 @@ export default function PrivacyPage() {
               <li>
                 <strong className="text-foreground">Anchor BaaS</strong> —
                 virtual accounts, wallet infrastructure, and NIP transfers.
-                Anchor is a licensed financial technology provider regulated
-                by the CBN.
+                Anchor is a licensed financial technology provider regulated by
+                the CBN.
               </li>
               <li>
                 <strong className="text-foreground">
@@ -673,16 +654,16 @@ export default function PrivacyPage() {
               </li>
             </ul>
             <p>
-              All third-party processors are selected for their compliance
-              with applicable data protection laws and are bound by data
-              processing agreements where required. Our platform may also
-              contain links to third-party websites — we are not responsible
-              for their privacy practices.
+              All third-party processors are selected for their compliance with
+              applicable data protection laws and are bound by data processing
+              agreements where required. Our platform may also contain links to
+              third-party websites — we are not responsible for their privacy
+              practices.
             </p>
           </section>
 
           {/* 14 */}
-          <section id="children" className="space-y-3 scroll-mt-8">
+          <section id="children" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               14. Children's Privacy
             </h2>
@@ -696,16 +677,16 @@ export default function PrivacyPage() {
           </section>
 
           {/* 15 */}
-          <section id="changes" className="space-y-3 scroll-mt-8">
+          <section id="changes" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               15. Changes to This Policy
             </h2>
             <p>
-              We may update this Privacy Policy periodically. We will notify
-              you of significant changes via email and through a prominent
-              notice on our platform before the change becomes effective. The
-              "Last updated" date at the top of this page will always reflect
-              the most recent revision.
+              We may update this Privacy Policy periodically. We will notify you
+              of significant changes via email and through a prominent notice on
+              our platform before the change becomes effective. The "Last
+              updated" date at the top of this page will always reflect the most
+              recent revision.
             </p>
             <p>
               We encourage you to review this Policy regularly to stay informed
@@ -714,7 +695,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* 16 */}
-          <section id="contact" className="space-y-3 scroll-mt-8">
+          <section id="contact" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               16. Contact & Data Protection Officer
             </h2>
@@ -722,7 +703,7 @@ export default function PrivacyPage() {
               If you have questions, concerns, or wish to exercise your data
               rights, please contact us:
             </p>
-            <address className="not-italic space-y-1">
+            <address className="space-y-1 not-italic">
               <p className="font-medium text-foreground">Leadsage Africa</p>
               <p>
                 General & privacy inquiries:{" "}

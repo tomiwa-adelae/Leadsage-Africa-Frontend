@@ -39,7 +39,7 @@ const sections = [
 
 export default function TermsPage() {
   return (
-    <div className="container max-w-4xl py-12 lg:py-16">
+    <div className="container py-12 lg:py-16">
       {/* Header */}
       <div className="mb-10 space-y-2">
         <p className="text-sm font-medium text-primary">Legal</p>
@@ -50,13 +50,16 @@ export default function TermsPage() {
           Effective date: {EFFECTIVE_DATE} &nbsp;·&nbsp; Last updated:{" "}
           {EFFECTIVE_DATE}
         </p>
-        <p className="mt-4 text-base text-muted-foreground leading-relaxed">
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground">
           These Terms and Conditions ("Terms") govern your access to and use of
           LeadSage Africa ("LeadSage", "we", "our", or "us"), including our
           website, mobile applications, and all related services (collectively,
           the "Platform"). By accessing or using LeadSage, you confirm that you
           have read, understood, and agree to be bound by these Terms and our{" "}
-          <Link href="/privacy" className="text-primary underline underline-offset-4">
+          <Link
+            href="/privacy"
+            className="text-primary underline underline-offset-4"
+          >
             Privacy Policy
           </Link>
           .
@@ -67,7 +70,7 @@ export default function TermsPage() {
         {/* Table of contents — sticky on desktop */}
         <aside className="hidden lg:block">
           <div className="sticky top-8 space-y-1">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Contents
             </p>
             {sections.map((s) => (
@@ -85,7 +88,7 @@ export default function TermsPage() {
         {/* Body */}
         <div className="space-y-10 text-sm leading-relaxed text-muted-foreground">
           {/* 1 */}
-          <section id="acceptance" className="space-y-3 scroll-mt-8">
+          <section id="acceptance" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               1. Introduction &amp; Acceptance of Terms
             </h2>
@@ -97,14 +100,14 @@ export default function TermsPage() {
               to be bound by these Terms.
             </p>
             <p>
-              If you do not agree to these Terms, you must not use our
-              platform. We reserve the right to update these Terms at any time.
-              Continued use after changes constitutes acceptance.
+              If you do not agree to these Terms, you must not use our platform.
+              We reserve the right to update these Terms at any time. Continued
+              use after changes constitutes acceptance.
             </p>
           </section>
 
           {/* 2 */}
-          <section id="definitions" className="space-y-3 scroll-mt-8">
+          <section id="definitions" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               2. Definitions
             </h2>
@@ -118,13 +121,11 @@ export default function TermsPage() {
                 to LeadSage's goal-based savings feature.
               </li>
               <li>
-                <strong className="text-foreground">"Listings"</strong> refer
-                to property or service postings on the Platform.
+                <strong className="text-foreground">"Listings"</strong> refer to
+                property or service postings on the Platform.
               </li>
               <li>
-                <strong className="text-foreground">
-                  "Service Providers"
-                </strong>{" "}
+                <strong className="text-foreground">"Service Providers"</strong>{" "}
                 include agents, landlords, artisans, and vendors on the
                 Platform.
               </li>
@@ -137,23 +138,22 @@ export default function TermsPage() {
           </section>
 
           {/* 3 */}
-          <section id="services" className="space-y-3 scroll-mt-8">
+          <section id="services" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               3. Nature of Services
             </h2>
             <p>Leadsage Africa provides:</p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                <strong className="text-foreground">Property Listings</strong>{" "}
-                — a digital marketplace for long-term rentals, shortlets,
-                office spaces, and hotel rooms
+                <strong className="text-foreground">Property Listings</strong> —
+                a digital marketplace for long-term rentals, shortlets, office
+                spaces, and hotel rooms
               </li>
               <li>
                 <strong className="text-foreground">
                   Applications & Screening
                 </strong>{" "}
-                — tenant screening, document submission, and rental
-                applications
+                — tenant screening, document submission, and rental applications
               </li>
               <li>
                 <strong className="text-foreground">
@@ -166,12 +166,12 @@ export default function TermsPage() {
                 scheduling property viewings with landlords or agents
               </li>
               <li>
-                <strong className="text-foreground">Leadsage Wallet</strong> —
-                a digital wallet for funding, payments, and withdrawals
+                <strong className="text-foreground">Leadsage Wallet</strong> — a
+                digital wallet for funding, payments, and withdrawals
               </li>
               <li>
-                <strong className="text-foreground">SageNest Savings</strong>{" "}
-                — a financial planning and goal-based savings system
+                <strong className="text-foreground">SageNest Savings</strong> —
+                a financial planning and goal-based savings system
               </li>
               <li>
                 <strong className="text-foreground">Escrow Payments</strong> —
@@ -191,7 +191,7 @@ export default function TermsPage() {
           </section>
 
           {/* 4 */}
-          <section id="accounts" className="space-y-3 scroll-mt-8">
+          <section id="accounts" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               4. User Accounts &amp; Eligibility
             </h2>
@@ -203,14 +203,13 @@ export default function TermsPage() {
                 Nigerian address
               </li>
               <li>
-                Provide accurate, current, and complete registration
-                information
+                Provide accurate, current, and complete registration information
               </li>
               <li>Have a valid bank account</li>
               <li>Verify your email address after registration</li>
               <li>
-                Not create more than one account per person (duplicate
-                accounts may be suspended)
+                Not create more than one account per person (duplicate accounts
+                may be suspended)
               </li>
             </ul>
             <p>
@@ -233,7 +232,7 @@ export default function TermsPage() {
           </section>
 
           {/* 5 */}
-          <section id="kyc" className="space-y-3 scroll-mt-8">
+          <section id="kyc" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               5. KYC, AML &amp; Verification
             </h2>
@@ -256,14 +255,13 @@ export default function TermsPage() {
               </li>
               <li>Restrict accounts pending successful verification</li>
               <li>
-                Report suspicious activities to relevant regulatory
-                authorities
+                Report suspicious activities to relevant regulatory authorities
               </li>
             </ul>
           </section>
 
           {/* 6 */}
-          <section id="listings" className="space-y-3 scroll-mt-8">
+          <section id="listings" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               6. Listings &amp; Property Rules
             </h2>
@@ -282,17 +280,17 @@ export default function TermsPage() {
                 appointed to manage may be submitted.
               </li>
               <li>
-                All listings are subject to review and approval by the
-                Leadsage moderation team. We reserve the right to reject or
-                remove any listing.
+                All listings are subject to review and approval by the Leadsage
+                moderation team. We reserve the right to reject or remove any
+                listing.
               </li>
               <li>
                 Photos must be genuine representations of the property. Stock
                 images or deceptive photographs are not permitted.
               </li>
               <li>
-                Pricing must be stated in Nigerian Naira (₦). Landlords may
-                not solicit payments outside the Leadsage platform.
+                Pricing must be stated in Nigerian Naira (₦). Landlords may not
+                solicit payments outside the Leadsage platform.
               </li>
               <li>
                 Leadsage performs verification checks but does not guarantee
@@ -307,7 +305,7 @@ export default function TermsPage() {
           </section>
 
           {/* 7 */}
-          <section id="bookings" className="space-y-3 scroll-mt-8">
+          <section id="bookings" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               7. Rentals, Bookings &amp; Applications
             </h2>
@@ -320,22 +318,22 @@ export default function TermsPage() {
             </p>
             <p>
               <strong className="text-foreground">Shortlet Bookings:</strong>{" "}
-              Renters may book shortlet properties for specified dates. Where
-              a listing is marked "Instant Book", the booking is confirmed
+              Renters may book shortlet properties for specified dates. Where a
+              listing is marked "Instant Book", the booking is confirmed
               automatically upon payment. Otherwise, the landlord must confirm
               the booking within the specified window.
             </p>
             <p>
               <strong className="text-foreground">Cancellations:</strong>{" "}
-              Cancellation policies are set by the landlord and displayed on
-              the listing page. Leadsage is not liable for cancellations made
-              by either party. Refunds for cancellations are subject to the
+              Cancellation policies are set by the landlord and displayed on the
+              listing page. Leadsage is not liable for cancellations made by
+              either party. Refunds for cancellations are subject to the
               applicable cancellation policy and our escrow release terms.
             </p>
           </section>
 
           {/* 8 */}
-          <section id="payments" className="space-y-3 scroll-mt-8">
+          <section id="payments" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               8. Payments, Escrow &amp; Refunds
             </h2>
@@ -346,28 +344,27 @@ export default function TermsPage() {
             </p>
             <p>
               <strong className="text-foreground">Escrow:</strong> Rental and
-              booking payments are held in escrow for a defined period after
-              the transaction (typically 24 hours after payment for rentals,
-              or 24 hours after check-in for shortlets). Funds are only
-              released to the landlord after the hold period lapses without a
-              valid dispute.
+              booking payments are held in escrow for a defined period after the
+              transaction (typically 24 hours after payment for rentals, or 24
+              hours after check-in for shortlets). Funds are only released to
+              the landlord after the hold period lapses without a valid dispute.
             </p>
             <p>
-              <strong className="text-foreground">Refunds:</strong> Refunds
-              are processed in accordance with the applicable cancellation
-              policy. Card payment refunds are returned to the original
-              payment method. Wallet payment refunds are credited to the
-              payer's Leadsage wallet.
+              <strong className="text-foreground">Refunds:</strong> Refunds are
+              processed in accordance with the applicable cancellation policy.
+              Card payment refunds are returned to the original payment method.
+              Wallet payment refunds are credited to the payer's Leadsage
+              wallet.
             </p>
             <p>
               Leadsage does not guarantee the quality, safety, or legality of
-              any property. We are a payment facilitator, not a guarantor of
-              any transaction.
+              any property. We are a payment facilitator, not a guarantor of any
+              transaction.
             </p>
           </section>
 
           {/* 9 */}
-          <section id="sagenest" className="space-y-3 scroll-mt-8">
+          <section id="sagenest" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               9. SageNest Savings
             </h2>
@@ -393,8 +390,8 @@ export default function TermsPage() {
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
                 Withdrawal of locked savings before the maturity date may be
-                subject to applicable charges or penalties as stated at the
-                time of plan creation.
+                subject to applicable charges or penalties as stated at the time
+                of plan creation.
               </li>
               <li>
                 Withdrawals are subject to liquidity availability, product
@@ -410,8 +407,7 @@ export default function TermsPage() {
               </li>
               <li>Market conditions may affect earnings.</li>
               <li>
-                Temporary delays may occur due to system or partner
-                constraints.
+                Temporary delays may occur due to system or partner constraints.
               </li>
               <li>
                 SageNest is a savings product, not an investment scheme. Your
@@ -421,14 +417,14 @@ export default function TermsPage() {
           </section>
 
           {/* 10 */}
-          <section id="wallet" className="space-y-3 scroll-mt-8">
+          <section id="wallet" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               10. Wallet &amp; Financial Services
             </h2>
             <p>
-              The Leadsage Wallet is a digital payment wallet powered by
-              Anchor BaaS. To activate your wallet and access full
-              functionality, you must complete our KYC process, which requires:
+              The Leadsage Wallet is a digital payment wallet powered by Anchor
+              BaaS. To activate your wallet and access full functionality, you
+              must complete our KYC process, which requires:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
@@ -440,26 +436,26 @@ export default function TermsPage() {
             <p>
               A 4-digit transaction PIN is required to authorise all wallet
               transactions including payments and withdrawals. You are solely
-              responsible for keeping your PIN confidential. Leadsage will
-              never ask for your PIN by phone, email, or any other channel.
+              responsible for keeping your PIN confidential. Leadsage will never
+              ask for your PIN by phone, email, or any other channel.
             </p>
             <p>
               Wallet funds are not NDIC-insured. Leadsage holds your wallet
               balance in a pooled account with our licensed BaaS partner.
-              Withdrawals are subject to network availability and may take up
-              to one business day to reflect in your bank account.
+              Withdrawals are subject to network availability and may take up to
+              one business day to reflect in your bank account.
             </p>
           </section>
 
           {/* 11 */}
-          <section id="fees" className="space-y-3 scroll-mt-8">
+          <section id="fees" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               11. Fees &amp; Commission
             </h2>
             <p>
               Leadsage charges a platform service fee of{" "}
-              <strong className="text-foreground">5%</strong> on all rental
-              and booking payments processed through the platform. This fee is
+              <strong className="text-foreground">5%</strong> on all rental and
+              booking payments processed through the platform. This fee is
               deducted from the amount disbursed to the landlord upon escrow
               release.
             </p>
@@ -476,7 +472,7 @@ export default function TermsPage() {
           </section>
 
           {/* 12 */}
-          <section id="prohibited" className="space-y-3 scroll-mt-8">
+          <section id="prohibited" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               12. Prohibited Activities
             </h2>
@@ -495,8 +491,8 @@ export default function TermsPage() {
                 money or finance criminal activity
               </li>
               <li>
-                Circumvent platform fees or impersonate any person or
-                Leadsage representative
+                Circumvent platform fees or impersonate any person or Leadsage
+                representative
               </li>
               <li>
                 Interfere with platform security or attempt to scrape,
@@ -523,27 +519,26 @@ export default function TermsPage() {
           </section>
 
           {/* 13 */}
-          <section id="ip" className="space-y-3 scroll-mt-8">
+          <section id="ip" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               13. Intellectual Property
             </h2>
             <p>
-              All platform content including logos, software, and design
-              belongs to Leadsage Africa or its licensors. You may not copy,
-              reproduce, distribute, or create derivative works without our
-              prior written consent, or use the brand for unauthorised
-              purposes.
+              All platform content including logos, software, and design belongs
+              to Leadsage Africa or its licensors. You may not copy, reproduce,
+              distribute, or create derivative works without our prior written
+              consent, or use the brand for unauthorised purposes.
             </p>
             <p>
-              By uploading content (photos, documents, listing descriptions)
-              to Leadsage, you grant us a non-exclusive, royalty-free,
-              worldwide licence to use, display, and distribute that content
-              solely for operating and promoting our services.
+              By uploading content (photos, documents, listing descriptions) to
+              Leadsage, you grant us a non-exclusive, royalty-free, worldwide
+              licence to use, display, and distribute that content solely for
+              operating and promoting our services.
             </p>
           </section>
 
           {/* 14 */}
-          <section id="third-party" className="space-y-3 scroll-mt-8">
+          <section id="third-party" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               14. Third-Party Services
             </h2>
@@ -566,14 +561,14 @@ export default function TermsPage() {
           </section>
 
           {/* 15 */}
-          <section id="liability" className="space-y-3 scroll-mt-8">
+          <section id="liability" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               15. Limitation of Liability
             </h2>
             <p>
               The Leadsage platform is provided "as is" and "as available"
-              without warranties of any kind, express or implied. To the
-              fullest extent permitted by law, Leadsage is not liable for:
+              without warranties of any kind, express or implied. To the fullest
+              extent permitted by law, Leadsage is not liable for:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
@@ -581,16 +576,11 @@ export default function TermsPage() {
                 renters
               </li>
               <li>Fraud committed by third parties</li>
+              <li>Financial losses from savings or investments via SageNest</li>
               <li>
-                Financial losses from savings or investments via SageNest
+                System downtime, payment delays, or third-party service failures
               </li>
-              <li>
-                System downtime, payment delays, or third-party service
-                failures
-              </li>
-              <li>
-                Inaccurate property information provided by a landlord
-              </li>
+              <li>Inaccurate property information provided by a landlord</li>
               <li>
                 Unauthorised access to your account due to your negligence
               </li>
@@ -604,16 +594,15 @@ export default function TermsPage() {
           </section>
 
           {/* 16 */}
-          <section id="indemnification" className="space-y-3 scroll-mt-8">
+          <section id="indemnification" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               16. Indemnification
             </h2>
             <p>
-              You agree to indemnify, defend, and hold harmless Leadsage
-              Africa and its officers, directors, employees, and agents from
-              and against any claims, liabilities, damages, losses, and
-              expenses (including legal fees) arising out of or in connection
-              with:
+              You agree to indemnify, defend, and hold harmless Leadsage Africa
+              and its officers, directors, employees, and agents from and
+              against any claims, liabilities, damages, losses, and expenses
+              (including legal fees) arising out of or in connection with:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>Your access to or use of the Platform</li>
@@ -626,7 +615,7 @@ export default function TermsPage() {
           </section>
 
           {/* 17 */}
-          <section id="termination" className="space-y-3 scroll-mt-8">
+          <section id="termination" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               17. Suspension &amp; Termination
             </h2>
@@ -658,7 +647,7 @@ export default function TermsPage() {
           </section>
 
           {/* 18 */}
-          <section id="regulatory" className="space-y-3 scroll-mt-8">
+          <section id="regulatory" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               18. Regulatory Compliance
             </h2>
@@ -668,20 +657,20 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>Nigerian financial regulations (CBN guidelines)</li>
-              <li>Anti-money laundering (AML) and counter-terrorism financing laws</li>
-              <li>Real estate regulatory standards</li>
               <li>
-                Nigeria Data Protection Act 2023 (NDPA) and NDPR 2019
+                Anti-money laundering (AML) and counter-terrorism financing laws
               </li>
+              <li>Real estate regulatory standards</li>
+              <li>Nigeria Data Protection Act 2023 (NDPA) and NDPR 2019</li>
             </ul>
             <p>
-              Users agree to comply with all applicable laws and regulations
-              in their use of the Platform.
+              Users agree to comply with all applicable laws and regulations in
+              their use of the Platform.
             </p>
           </section>
 
           {/* 19 */}
-          <section id="communications" className="space-y-3 scroll-mt-8">
+          <section id="communications" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               19. Electronic Communications
             </h2>
@@ -695,20 +684,23 @@ export default function TermsPage() {
               <li>In-platform alerts and notices</li>
             </ul>
             <p>
-              These electronic communications satisfy any legal requirement
-              that such communications be in writing and are legally binding
-              to the same extent as written communications.
+              These electronic communications satisfy any legal requirement that
+              such communications be in writing and are legally binding to the
+              same extent as written communications.
             </p>
           </section>
 
           {/* 20 */}
-          <section id="privacy" className="space-y-3 scroll-mt-8">
+          <section id="privacy" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               20. Data Privacy
             </h2>
             <p>
               Your use of the Platform is also governed by our{" "}
-              <Link href="/privacy" className="text-primary underline underline-offset-4">
+              <Link
+                href="/privacy"
+                className="text-primary underline underline-offset-4"
+              >
                 Privacy Policy
               </Link>
               , which is incorporated into these Terms by reference. We may
@@ -719,7 +711,7 @@ export default function TermsPage() {
           </section>
 
           {/* 21 */}
-          <section id="force-majeure" className="space-y-3 scroll-mt-8">
+          <section id="force-majeure" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               21. Force Majeure
             </h2>
@@ -737,7 +729,7 @@ export default function TermsPage() {
           </section>
 
           {/* 22 */}
-          <section id="disputes" className="space-y-3 scroll-mt-8">
+          <section id="disputes" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               22. Dispute Resolution
             </h2>
@@ -748,27 +740,26 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                <strong className="text-foreground">Negotiation</strong> —
-                both parties will first attempt to resolve the dispute
-                informally within 30 days of written notice
+                <strong className="text-foreground">Negotiation</strong> — both
+                parties will first attempt to resolve the dispute informally
+                within 30 days of written notice
               </li>
               <li>
                 <strong className="text-foreground">Mediation</strong> — if
-                negotiation fails, the parties will submit to mediation before
-                a mutually agreed mediator
+                negotiation fails, the parties will submit to mediation before a
+                mutually agreed mediator
               </li>
               <li>
                 <strong className="text-foreground">Arbitration</strong> — if
                 mediation is unsuccessful, the dispute shall be referred to
-                binding arbitration in Lagos, Nigeria, under applicable
-                Nigerian arbitration rules. Arbitration decisions are final
-                and binding.
+                binding arbitration in Lagos, Nigeria, under applicable Nigerian
+                arbitration rules. Arbitration decisions are final and binding.
               </li>
             </ul>
           </section>
 
           {/* 23 */}
-          <section id="governing" className="space-y-3 scroll-mt-8">
+          <section id="governing" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               23. Governing Law
             </h2>
@@ -779,35 +770,32 @@ export default function TermsPage() {
               of the courts of Lagos State, Nigeria.
             </p>
             <p>
-              Where mandatory local consumer protection laws apply, those
-              rights are not excluded by these Terms.
+              Where mandatory local consumer protection laws apply, those rights
+              are not excluded by these Terms.
             </p>
           </section>
 
           {/* 24 */}
-          <section id="changes" className="space-y-3 scroll-mt-8">
+          <section id="changes" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               24. Changes to These Terms
             </h2>
             <p>
-              We may update these Terms at any time. When we do, we will
-              revise the "Last updated" date at the top of this page and, for
-              material changes, notify you by email or via an in-app
-              notification. Your continued use of the platform after the
-              effective date of any changes constitutes acceptance of the
-              updated Terms.
+              We may update these Terms at any time. When we do, we will revise
+              the "Last updated" date at the top of this page and, for material
+              changes, notify you by email or via an in-app notification. Your
+              continued use of the platform after the effective date of any
+              changes constitutes acceptance of the updated Terms.
             </p>
           </section>
 
           {/* 25 */}
-          <section id="contact" className="space-y-3 scroll-mt-8">
+          <section id="contact" className="scroll-mt-8 space-y-3">
             <h2 className="text-base font-semibold text-foreground">
               25. Contact Us
             </h2>
-            <p>
-              If you have questions about these Terms, please contact us:
-            </p>
-            <address className="not-italic space-y-1">
+            <p>If you have questions about these Terms, please contact us:</p>
+            <address className="space-y-1 not-italic">
               <p className="font-medium text-foreground">Leadsage Africa</p>
               <p>
                 Email:{" "}

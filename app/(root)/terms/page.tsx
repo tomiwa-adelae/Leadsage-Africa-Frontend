@@ -2,30 +2,39 @@ import { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Terms of Service · Leadsage Africa",
+  title: "Terms & Conditions · Leadsage Africa",
   description:
-    "Read the Terms of Service governing your use of Leadsage Africa's housing, savings, and payment platform.",
+    "Read the Terms and Conditions governing your use of Leadsage Africa's housing, savings, and payment platform.",
 }
 
-const EFFECTIVE_DATE = "21 April 2026"
+const EFFECTIVE_DATE = "22 April 2026"
 
 const sections = [
-  { id: "acceptance", title: "1. Acceptance of Terms" },
-  { id: "services", title: "2. Description of Services" },
-  { id: "accounts", title: "3. User Accounts & Eligibility" },
-  { id: "listings", title: "4. Listings & Property Rules" },
-  { id: "bookings", title: "5. Rentals, Bookings & Applications" },
-  { id: "payments", title: "6. Payments, Escrow & Refunds" },
-  { id: "firstkey", title: "7. FirstKey Savings" },
-  { id: "wallet", title: "8. Wallet & Financial Services" },
-  { id: "fees", title: "9. Fees & Commission" },
-  { id: "prohibited", title: "10. Prohibited Activities" },
-  { id: "ip", title: "11. Intellectual Property" },
-  { id: "liability", title: "12. Disclaimers & Limitation of Liability" },
-  { id: "termination", title: "13. Termination" },
-  { id: "governing", title: "14. Governing Law" },
-  { id: "changes", title: "15. Changes to These Terms" },
-  { id: "contact", title: "16. Contact Us" },
+  { id: "acceptance", title: "1. Introduction & Acceptance" },
+  { id: "definitions", title: "2. Definitions" },
+  { id: "services", title: "3. Nature of Services" },
+  { id: "accounts", title: "4. User Accounts & Eligibility" },
+  { id: "kyc", title: "5. KYC, AML & Verification" },
+  { id: "listings", title: "6. Listings & Property Rules" },
+  { id: "bookings", title: "7. Rentals, Bookings & Applications" },
+  { id: "payments", title: "8. Payments, Escrow & Refunds" },
+  { id: "sagenest", title: "9. SageNest Savings" },
+  { id: "wallet", title: "10. Wallet & Financial Services" },
+  { id: "fees", title: "11. Fees & Commission" },
+  { id: "prohibited", title: "12. Prohibited Activities" },
+  { id: "ip", title: "13. Intellectual Property" },
+  { id: "third-party", title: "14. Third-Party Services" },
+  { id: "liability", title: "15. Limitation of Liability" },
+  { id: "indemnification", title: "16. Indemnification" },
+  { id: "termination", title: "17. Suspension & Termination" },
+  { id: "regulatory", title: "18. Regulatory Compliance" },
+  { id: "communications", title: "19. Electronic Communications" },
+  { id: "privacy", title: "20. Data Privacy" },
+  { id: "force-majeure", title: "21. Force Majeure" },
+  { id: "disputes", title: "22. Dispute Resolution" },
+  { id: "governing", title: "23. Governing Law" },
+  { id: "changes", title: "24. Changes to These Terms" },
+  { id: "contact", title: "25. Contact Us" },
 ]
 
 export default function TermsPage() {
@@ -35,16 +44,22 @@ export default function TermsPage() {
       <div className="mb-10 space-y-2">
         <p className="text-sm font-medium text-primary">Legal</p>
         <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
-          Terms of Service
+          Terms &amp; Conditions
         </h1>
         <p className="text-sm text-muted-foreground">
           Effective date: {EFFECTIVE_DATE} &nbsp;·&nbsp; Last updated:{" "}
           {EFFECTIVE_DATE}
         </p>
         <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-          Welcome to Leadsage Africa. By creating an account or using any part
-          of our platform, you agree to be bound by these Terms of Service.
-          Please read them carefully.
+          These Terms and Conditions ("Terms") govern your access to and use of
+          LeadSage Africa ("LeadSage", "we", "our", or "us"), including our
+          website, mobile applications, and all related services (collectively,
+          the "Platform"). By accessing or using LeadSage, you confirm that you
+          have read, understood, and agree to be bound by these Terms and our{" "}
+          <Link href="/privacy" className="text-primary underline underline-offset-4">
+            Privacy Policy
+          </Link>
+          .
         </p>
       </div>
 
@@ -72,19 +87,14 @@ export default function TermsPage() {
           {/* 1 */}
           <section id="acceptance" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              1. Acceptance of Terms
+              1. Introduction &amp; Acceptance of Terms
             </h2>
             <p>
-              These Terms of Service ("Terms") form a legally binding agreement
-              between you ("User", "you") and Leadsage Africa ("Leadsage",
-              "we", "us", "our"), a technology company operating Nigeria's
-              housing platform. By accessing or using our website, mobile
-              application, or any services we provide, you confirm that you
-              have read, understood, and agree to these Terms and our{" "}
-              <Link href="/privacy" className="text-primary underline underline-offset-4">
-                Privacy Policy
-              </Link>
-              .
+              These Terms form a legally binding agreement between you ("User",
+              "you") and Leadsage Africa ("Leadsage", "we", "us", "our"), a
+              technology company operating Nigeria's housing platform. By
+              creating an account or using any part of our platform, you agree
+              to be bound by these Terms.
             </p>
             <p>
               If you do not agree to these Terms, you must not use our
@@ -94,62 +104,109 @@ export default function TermsPage() {
           </section>
 
           {/* 2 */}
+          <section id="definitions" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              2. Definitions
+            </h2>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>
+                <strong className="text-foreground">"User"</strong> means any
+                person who accesses or uses the Platform.
+              </li>
+              <li>
+                <strong className="text-foreground">"SageNest"</strong> refers
+                to LeadSage's goal-based savings feature.
+              </li>
+              <li>
+                <strong className="text-foreground">"Listings"</strong> refer
+                to property or service postings on the Platform.
+              </li>
+              <li>
+                <strong className="text-foreground">
+                  "Service Providers"
+                </strong>{" "}
+                include agents, landlords, artisans, and vendors on the
+                Platform.
+              </li>
+              <li>
+                <strong className="text-foreground">"Platform"</strong> means
+                the Leadsage Africa website, mobile applications, and all
+                related services.
+              </li>
+            </ul>
+          </section>
+
+          {/* 3 */}
           <section id="services" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              2. Description of Services
+              3. Nature of Services
             </h2>
-            <p>
-              Leadsage Africa is a technology platform that connects property
-              seekers (renters, tenants, guests) with property owners and
-              managers (landlords, hosts) across Nigeria. Our services include:
-            </p>
+            <p>Leadsage Africa provides:</p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
                 <strong className="text-foreground">Property Listings</strong>{" "}
-                — long-term rentals, shortlets, office spaces, and hotel rooms
+                — a digital marketplace for long-term rentals, shortlets,
+                office spaces, and hotel rooms
               </li>
               <li>
-                <strong className="text-foreground">Applications & Screening</strong>{" "}
-                — tenant screening, document submission, and rental applications
+                <strong className="text-foreground">
+                  Applications & Screening
+                </strong>{" "}
+                — tenant screening, document submission, and rental
+                applications
+              </li>
+              <li>
+                <strong className="text-foreground">
+                  Access to verified agents and artisans
+                </strong>{" "}
+                — connecting users with trusted service providers
               </li>
               <li>
                 <strong className="text-foreground">Tour Requests</strong> —
                 scheduling property viewings with landlords or agents
               </li>
               <li>
-                <strong className="text-foreground">
-                  Leadsage Wallet
-                </strong>{" "}
-                — a digital wallet for funding, payments, and withdrawals
+                <strong className="text-foreground">Leadsage Wallet</strong> —
+                a digital wallet for funding, payments, and withdrawals
               </li>
               <li>
-                <strong className="text-foreground">FirstKey Savings</strong>{" "}
-                — goal-based savings products designed to help renters save
-                toward their next rent or property deposit
+                <strong className="text-foreground">SageNest Savings</strong>{" "}
+                — a financial planning and goal-based savings system
               </li>
               <li>
-                <strong className="text-foreground">Escrow Payments</strong>{" "}
-                — secure holding of rental and booking payments until release
+                <strong className="text-foreground">Escrow Payments</strong> —
+                secure holding of rental and booking payments until release
                 conditions are met
               </li>
             </ul>
-            <p>
-              Leadsage is a marketplace and technology platform. We are not a
-              landlord, property agent, estate surveyor, or financial
-              institution. We do not own any of the listed properties.
-            </p>
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 dark:border-yellow-900 dark:bg-yellow-950/30">
+              <p className="font-medium text-foreground">Important:</p>
+              <p className="mt-1">
+                LeadSage is a facilitator only. We do{" "}
+                <strong className="text-foreground">not</strong> own listed
+                properties, act as a landlord, agent, or employer, or guarantee
+                transactions between users.
+              </p>
+            </div>
           </section>
 
-          {/* 3 */}
+          {/* 4 */}
           <section id="accounts" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              3. User Accounts & Eligibility
+              4. User Accounts &amp; Eligibility
             </h2>
             <p>To use Leadsage, you must:</p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>Be at least 18 years of age</li>
-              <li>Be a Nigerian resident or have a valid Nigerian address</li>
-              <li>Provide accurate, current, and complete registration information</li>
+              <li>
+                Be a Nigerian resident or legally eligible user with a valid
+                Nigerian address
+              </li>
+              <li>
+                Provide accurate, current, and complete registration
+                information
+              </li>
+              <li>Have a valid bank account</li>
               <li>Verify your email address after registration</li>
               <li>
                 Not create more than one account per person (duplicate
@@ -158,26 +215,57 @@ export default function TermsPage() {
             </ul>
             <p>
               You are responsible for maintaining the confidentiality of your
-              account credentials. All activity under your account is your
-              responsibility. Notify us immediately at{" "}
+              account credentials and for all activities under your account.
+              Notify us immediately at{" "}
               <a
                 href="mailto:support@leadsageafrica.com"
                 className="text-primary underline underline-offset-4"
               >
                 support@leadsageafrica.com
               </a>{" "}
-              if you suspect unauthorised access.
+              if you suspect unauthorised access. Leadsage is not liable for
+              losses caused by compromised accounts.
             </p>
             <p>
-              We may suspend or permanently ban any account that violates these
-              Terms, without notice, at our sole discretion.
+              We reserve the right to deny or terminate access if these
+              conditions are not met.
             </p>
           </section>
 
-          {/* 4 */}
+          {/* 5 */}
+          <section id="kyc" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              5. KYC, AML &amp; Verification
+            </h2>
+            <p>
+              To comply with Nigerian financial regulations and anti-money
+              laundering (AML) requirements, you agree to provide:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>
+                Valid government-issued ID (NIN, BVN, passport, or driver's
+                licence)
+              </li>
+              <li>Proof of address</li>
+              <li>Additional documents when requested</li>
+            </ul>
+            <p>Leadsage may:</p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>
+                Verify your identity through authorised third-party partners
+              </li>
+              <li>Restrict accounts pending successful verification</li>
+              <li>
+                Report suspicious activities to relevant regulatory
+                authorities
+              </li>
+            </ul>
+          </section>
+
+          {/* 6 */}
           <section id="listings" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              4. Listings & Property Rules
+              6. Listings &amp; Property Rules
             </h2>
             <p>
               Landlords and property managers who list properties on Leadsage
@@ -190,13 +278,13 @@ export default function TermsPage() {
                 prohibited.
               </li>
               <li>
-                Only properties you own, are authorised to list, or are
-                duly appointed to manage may be submitted.
+                Only properties you own, are authorised to list, or are duly
+                appointed to manage may be submitted.
               </li>
               <li>
                 All listings are subject to review and approval by the
-                Leadsage moderation team before being published. We reserve
-                the right to reject or remove any listing.
+                Leadsage moderation team. We reserve the right to reject or
+                remove any listing.
               </li>
               <li>
                 Photos must be genuine representations of the property. Stock
@@ -207,16 +295,21 @@ export default function TermsPage() {
                 not solicit payments outside the Leadsage platform.
               </li>
               <li>
-                Leadsage charges a service fee (commission) on transactions
-                processed through the platform. See Section 9 for details.
+                Leadsage performs verification checks but does not guarantee
+                listing authenticity and is not liable for disputes between
+                users.
+              </li>
+              <li>
+                Users must independently verify properties before making any
+                payment.
               </li>
             </ul>
           </section>
 
-          {/* 5 */}
+          {/* 7 */}
           <section id="bookings" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              5. Rentals, Bookings & Applications
+              7. Rentals, Bookings &amp; Applications
             </h2>
             <p>
               <strong className="text-foreground">Long-term Rentals:</strong>{" "}
@@ -241,10 +334,10 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* 6 */}
+          {/* 8 */}
           <section id="payments" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              6. Payments, Escrow & Refunds
+              8. Payments, Escrow &amp; Refunds
             </h2>
             <p>
               All payments for rentals and bookings made through the Leadsage
@@ -252,12 +345,12 @@ export default function TermsPage() {
               (Paystack for card payments, Anchor BaaS for wallet transfers).
             </p>
             <p>
-              <strong className="text-foreground">Escrow:</strong> Rental
-              and booking payments are held in escrow for a defined period
-              after the transaction (typically 24 hours after payment for
-              rentals, or 24 hours after check-in for shortlets). Escrow
-              protects both parties — funds are only released to the landlord
-              after the hold period lapses without a valid dispute.
+              <strong className="text-foreground">Escrow:</strong> Rental and
+              booking payments are held in escrow for a defined period after
+              the transaction (typically 24 hours after payment for rentals,
+              or 24 hours after check-in for shortlets). Funds are only
+              released to the landlord after the hold period lapses without a
+              valid dispute.
             </p>
             <p>
               <strong className="text-foreground">Refunds:</strong> Refunds
@@ -267,53 +360,75 @@ export default function TermsPage() {
               payer's Leadsage wallet.
             </p>
             <p>
-              Leadsage does not guarantee the quality, safety, or legality
-              of any property. We are a payment facilitator, not a guarantor
-              of any transaction.
+              Leadsage does not guarantee the quality, safety, or legality of
+              any property. We are a payment facilitator, not a guarantor of
+              any transaction.
             </p>
           </section>
 
-          {/* 7 */}
-          <section id="firstkey" className="space-y-3 scroll-mt-8">
+          {/* 9 */}
+          <section id="sagenest" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              7. FirstKey Savings
+              9. SageNest Savings
             </h2>
             <p>
-              FirstKey is a goal-based savings product offered through the
+              SageNest is a goal-based savings product offered through the
               Leadsage platform, powered by our banking-as-a-service partner
-              (Anchor). By using FirstKey:
+              (Anchor). By using SageNest:
             </p>
+
+            <p className="font-medium text-foreground">9.1 Nature of Funds</p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                You authorise Leadsage and its BaaS partner to hold your
-                savings in a dedicated account on your behalf.
+                Funds saved are held with licensed financial partners in a
+                dedicated account on your behalf.
               </li>
+              <li>
+                Funds may be pooled and invested in low-risk instruments in
+                accordance with applicable regulations.
+              </li>
+            </ul>
+
+            <p className="font-medium text-foreground">9.2 Withdrawals</p>
+            <ul className="list-disc space-y-1.5 pl-5">
               <li>
                 Withdrawal of locked savings before the maturity date may be
                 subject to applicable charges or penalties as stated at the
                 time of plan creation.
               </li>
               <li>
-                Returns or interest, where offered, are subject to change.
-                Leadsage does not guarantee specific investment returns.
+                Withdrawals are subject to liquidity availability, product
+                terms, and processing timelines.
+              </li>
+            </ul>
+
+            <p className="font-medium text-foreground">9.3 Risk Disclosure</p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>
+                Returns or interest, where offered, are not guaranteed and are
+                subject to change.
+              </li>
+              <li>Market conditions may affect earnings.</li>
+              <li>
+                Temporary delays may occur due to system or partner
+                constraints.
               </li>
               <li>
-                FirstKey is a savings product, not an investment scheme. Your
+                SageNest is a savings product, not an investment scheme. Your
                 principal is not at risk from market movements.
               </li>
             </ul>
           </section>
 
-          {/* 8 */}
+          {/* 10 */}
           <section id="wallet" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              8. Wallet & Financial Services
+              10. Wallet &amp; Financial Services
             </h2>
             <p>
               The Leadsage Wallet is a digital payment wallet powered by
               Anchor BaaS. To activate your wallet and access full
-              functionality, you must complete our Know Your Customer (KYC)
-              process, which requires:
+              functionality, you must complete our KYC process, which requires:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
@@ -331,27 +446,27 @@ export default function TermsPage() {
             <p>
               Wallet funds are not NDIC-insured. Leadsage holds your wallet
               balance in a pooled account with our licensed BaaS partner.
-              Withdrawals are subject to network availability and may take
-              up to one business day to reflect in your bank account.
+              Withdrawals are subject to network availability and may take up
+              to one business day to reflect in your bank account.
             </p>
           </section>
 
-          {/* 9 */}
+          {/* 11 */}
           <section id="fees" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              9. Fees & Commission
+              11. Fees &amp; Commission
             </h2>
             <p>
               Leadsage charges a platform service fee of{" "}
               <strong className="text-foreground">5%</strong> on all rental
-              and booking payments processed through the platform. This fee
-              is deducted from the amount disbursed to the landlord upon
-              escrow release.
+              and booking payments processed through the platform. This fee is
+              deducted from the amount disbursed to the landlord upon escrow
+              release.
             </p>
             <p>
-              Renters are not charged a service fee on payments. Fees for
-              additional services (e.g. application processing, premium
-              listings) will be disclosed at the point of use.
+              Leadsage may also charge listing fees, transaction commissions,
+              and premium subscription fees. All fees will be clearly
+              communicated at the point of use.
             </p>
             <p>
               All fees are inclusive of applicable VAT as required by Nigerian
@@ -360,36 +475,37 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* 10 */}
+          {/* 12 */}
           <section id="prohibited" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              10. Prohibited Activities
+              12. Prohibited Activities
             </h2>
-            <p>You must not use Leadsage to:</p>
+            <p>You may not use Leadsage to:</p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                Post fraudulent, misleading, or non-existent property listings
+                Engage in fraud, misrepresentation, or post fraudulent,
+                misleading, or non-existent listings
               </li>
               <li>
                 Solicit or accept payments for rentals or bookings outside the
                 Leadsage platform
               </li>
               <li>
-                Impersonate any person, landlord, property manager, or
+                Conduct illegal transactions or use the platform to launder
+                money or finance criminal activity
+              </li>
+              <li>
+                Circumvent platform fees or impersonate any person or
                 Leadsage representative
               </li>
               <li>
-                Use the platform to launder money, finance criminal activity,
-                or engage in any unlawful transaction
+                Interfere with platform security or attempt to scrape,
+                reverse-engineer, or exploit the platform or its data
               </li>
               <li>
                 Harass, threaten, or discriminate against other users on the
                 basis of gender, ethnicity, religion, or any other protected
                 characteristic
-              </li>
-              <li>
-                Attempt to scrape, reverse-engineer, or exploit the Leadsage
-                platform, its API, or its data
               </li>
               <li>
                 Create multiple accounts to circumvent suspensions or
@@ -401,21 +517,22 @@ export default function TermsPage() {
               </li>
             </ul>
             <p>
-              Violation of any of the above may result in immediate account
-              suspension or permanent banning without refund.
+              Violations may result in immediate account suspension, permanent
+              banning, fund restriction, or legal action without refund.
             </p>
           </section>
 
-          {/* 11 */}
+          {/* 13 */}
           <section id="ip" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              11. Intellectual Property
+              13. Intellectual Property
             </h2>
             <p>
-              All content, design, trademarks, logos, and software on the
-              Leadsage platform are the exclusive property of Leadsage Africa
-              or its licensors. You may not reproduce, distribute, or create
-              derivative works without our prior written consent.
+              All platform content including logos, software, and design
+              belongs to Leadsage Africa or its licensors. You may not copy,
+              reproduce, distribute, or create derivative works without our
+              prior written consent, or use the brand for unauthorised
+              purposes.
             </p>
             <p>
               By uploading content (photos, documents, listing descriptions)
@@ -425,50 +542,108 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* 12 */}
-          <section id="liability" className="space-y-3 scroll-mt-8">
+          {/* 14 */}
+          <section id="third-party" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              12. Disclaimers & Limitation of Liability
+              14. Third-Party Services
             </h2>
             <p>
-              The Leadsage platform is provided "as is" and "as available"
-              without warranties of any kind, express or implied. We do not
-              warrant that the platform will be error-free, uninterrupted, or
-              free of viruses or other harmful components.
-            </p>
-            <p>
-              Leadsage is not liable for any direct, indirect, incidental,
-              special, or consequential damages arising from:
+              Leadsage integrates third-party services including payment
+              processors, identity verification providers, and cloud
+              infrastructure. We are not responsible for:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                Any transaction between a landlord and a renter, including
-                disputes over property condition, tenancy terms, or refunds
+                Failures, delays, or errors from third-party providers
+                (Paystack, Anchor BaaS, Prembly, Mailjet, Cloudflare)
+              </li>
+              <li>External service disruptions beyond our control</li>
+            </ul>
+            <p>
+              Use of third-party services is subject to their respective terms
+              and privacy policies.
+            </p>
+          </section>
+
+          {/* 15 */}
+          <section id="liability" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              15. Limitation of Liability
+            </h2>
+            <p>
+              The Leadsage platform is provided "as is" and "as available"
+              without warranties of any kind, express or implied. To the
+              fullest extent permitted by law, Leadsage is not liable for:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>
+                Property transaction losses or disputes between landlords and
+                renters
+              </li>
+              <li>Fraud committed by third parties</li>
+              <li>
+                Financial losses from savings or investments via SageNest
               </li>
               <li>
-                Failure of third-party payment providers (Paystack, Anchor)
+                System downtime, payment delays, or third-party service
+                failures
               </li>
               <li>
                 Inaccurate property information provided by a landlord
               </li>
-              <li>Unauthorised access to your account due to your negligence</li>
               <li>
-                Force majeure events — natural disasters, government actions,
-                or other events beyond our reasonable control
+                Unauthorised access to your account due to your negligence
               </li>
             </ul>
             <p>
-              To the maximum extent permitted by Nigerian law, our total
-              liability to you shall not exceed the total fees paid by you to
-              Leadsage in the 12 months preceding the claim.
+              Use of the platform is at your own risk. To the maximum extent
+              permitted by Nigerian law, our total liability to you shall not
+              exceed the total fees paid by you to Leadsage in the 12 months
+              preceding the claim.
             </p>
           </section>
 
-          {/* 13 */}
+          {/* 16 */}
+          <section id="indemnification" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              16. Indemnification
+            </h2>
+            <p>
+              You agree to indemnify, defend, and hold harmless Leadsage
+              Africa and its officers, directors, employees, and agents from
+              and against any claims, liabilities, damages, losses, and
+              expenses (including legal fees) arising out of or in connection
+              with:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Your access to or use of the Platform</li>
+              <li>Your violation of these Terms</li>
+              <li>Disputes with other users arising from your actions</li>
+              <li>
+                Any content you submit, post, or transmit through the Platform
+              </li>
+            </ul>
+          </section>
+
+          {/* 17 */}
           <section id="termination" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              13. Termination
+              17. Suspension &amp; Termination
             </h2>
+            <p>
+              We may suspend or terminate your account immediately, without
+              prior notice, if:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Fraud or suspicious activity is detected</li>
+              <li>You violate any provision of these Terms</li>
+              <li>Required by law or a regulatory authority</li>
+            </ul>
+            <p>
+              Funds may be restricted pending investigation. Termination does
+              not relieve you of any obligations incurred prior to the
+              termination date.
+            </p>
             <p>
               You may close your account at any time by contacting us at{" "}
               <a
@@ -477,27 +652,131 @@ export default function TermsPage() {
               >
                 support@leadsageafrica.com
               </a>
-              . Any outstanding wallet balance will be disbursed to a
-              verified bank account before closure.
-            </p>
-            <p>
-              We may terminate or suspend your account immediately, without
-              prior notice, if we believe you have violated these Terms or
-              any applicable law. Termination does not relieve you of any
-              obligations incurred prior to the termination date.
+              . Any outstanding wallet balance will be disbursed to a verified
+              bank account before closure.
             </p>
           </section>
 
-          {/* 14 */}
-          <section id="governing" className="space-y-3 scroll-mt-8">
+          {/* 18 */}
+          <section id="regulatory" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              14. Governing Law
+              18. Regulatory Compliance
             </h2>
             <p>
-              These Terms are governed by and construed in accordance with
-              the laws of the Federal Republic of Nigeria. Any dispute arising
-              out of or in connection with these Terms shall be subject to
-              the exclusive jurisdiction of the courts of Lagos State, Nigeria.
+              Leadsage operates in accordance with applicable Nigerian laws and
+              regulations, including:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Nigerian financial regulations (CBN guidelines)</li>
+              <li>Anti-money laundering (AML) and counter-terrorism financing laws</li>
+              <li>Real estate regulatory standards</li>
+              <li>
+                Nigeria Data Protection Act 2023 (NDPA) and NDPR 2019
+              </li>
+            </ul>
+            <p>
+              Users agree to comply with all applicable laws and regulations
+              in their use of the Platform.
+            </p>
+          </section>
+
+          {/* 19 */}
+          <section id="communications" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              19. Electronic Communications
+            </h2>
+            <p>
+              By using the Leadsage platform, you consent to receive
+              communications from us electronically, including:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Transactional and notification emails</li>
+              <li>SMS notifications</li>
+              <li>In-platform alerts and notices</li>
+            </ul>
+            <p>
+              These electronic communications satisfy any legal requirement
+              that such communications be in writing and are legally binding
+              to the same extent as written communications.
+            </p>
+          </section>
+
+          {/* 20 */}
+          <section id="privacy" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              20. Data Privacy
+            </h2>
+            <p>
+              Your use of the Platform is also governed by our{" "}
+              <Link href="/privacy" className="text-primary underline underline-offset-4">
+                Privacy Policy
+              </Link>
+              , which is incorporated into these Terms by reference. We may
+              share your data with financial partners, identity verification
+              providers, and regulatory authorities as required by law or to
+              deliver our services.
+            </p>
+          </section>
+
+          {/* 21 */}
+          <section id="force-majeure" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              21. Force Majeure
+            </h2>
+            <p>
+              Leadsage is not liable for any failure or delay in performance
+              caused by circumstances beyond our reasonable control, including:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Network or internet failures</li>
+              <li>Government actions, sanctions, or regulatory orders</li>
+              <li>Natural disasters or acts of God</li>
+              <li>Banking system disruptions or partner outages</li>
+              <li>Civil unrest or other extraordinary events</li>
+            </ul>
+          </section>
+
+          {/* 22 */}
+          <section id="disputes" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              22. Dispute Resolution
+            </h2>
+            <p>
+              In the event of a dispute arising out of or in connection with
+              these Terms or your use of the Platform, the parties agree to
+              resolve the matter through the following process:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>
+                <strong className="text-foreground">Negotiation</strong> —
+                both parties will first attempt to resolve the dispute
+                informally within 30 days of written notice
+              </li>
+              <li>
+                <strong className="text-foreground">Mediation</strong> — if
+                negotiation fails, the parties will submit to mediation before
+                a mutually agreed mediator
+              </li>
+              <li>
+                <strong className="text-foreground">Arbitration</strong> — if
+                mediation is unsuccessful, the dispute shall be referred to
+                binding arbitration in Lagos, Nigeria, under applicable
+                Nigerian arbitration rules. Arbitration decisions are final
+                and binding.
+              </li>
+            </ul>
+          </section>
+
+          {/* 23 */}
+          <section id="governing" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              23. Governing Law
+            </h2>
+            <p>
+              These Terms are governed by and construed in accordance with the
+              laws of the Federal Republic of Nigeria. Any dispute not resolved
+              through arbitration shall be subject to the exclusive jurisdiction
+              of the courts of Lagos State, Nigeria.
             </p>
             <p>
               Where mandatory local consumer protection laws apply, those
@@ -505,25 +784,25 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* 15 */}
+          {/* 24 */}
           <section id="changes" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              15. Changes to These Terms
+              24. Changes to These Terms
             </h2>
             <p>
-              We may update these Terms from time to time. When we do, we
-              will revise the "Last updated" date at the top of this page and,
-              for material changes, notify you by email or via an in-app
+              We may update these Terms at any time. When we do, we will
+              revise the "Last updated" date at the top of this page and, for
+              material changes, notify you by email or via an in-app
               notification. Your continued use of the platform after the
               effective date of any changes constitutes acceptance of the
               updated Terms.
             </p>
           </section>
 
-          {/* 16 */}
+          {/* 25 */}
           <section id="contact" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              16. Contact Us
+              25. Contact Us
             </h2>
             <p>
               If you have questions about these Terms, please contact us:
@@ -537,6 +816,17 @@ export default function TermsPage() {
                   className="text-primary underline underline-offset-4"
                 >
                   support@leadsageafrica.com
+                </a>
+              </p>
+              <p>
+                Website:{" "}
+                <a
+                  href="https://www.leadsageafrica.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-4"
+                >
+                  www.leadsageafrica.com
                 </a>
               </p>
               <p>Location: Lagos, Nigeria</p>

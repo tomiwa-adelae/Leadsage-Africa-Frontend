@@ -4,26 +4,28 @@ import Link from "next/link"
 export const metadata: Metadata = {
   title: "Privacy Policy · Leadsage Africa",
   description:
-    "Learn how Leadsage Africa collects, uses, and protects your personal data in accordance with the Nigeria Data Protection Regulation (NDPR).",
+    "Learn how Leadsage Africa collects, uses, and protects your personal data in accordance with the Nigeria Data Protection Act 2023 (NDPA) and the Nigeria Data Protection Regulation (NDPR).",
 }
 
-const EFFECTIVE_DATE = "21 April 2026"
+const EFFECTIVE_DATE = "22 April 2026"
 
 const sections = [
   { id: "intro", title: "1. Introduction" },
-  { id: "collect", title: "2. Information We Collect" },
-  { id: "use", title: "3. How We Use Your Information" },
-  { id: "sharing", title: "4. Information Sharing" },
-  { id: "kyc", title: "5. KYC & Identity Verification" },
-  { id: "financial", title: "6. Financial & Payment Data" },
-  { id: "cookies", title: "7. Cookies & Tracking" },
-  { id: "retention", title: "8. Data Retention" },
-  { id: "rights", title: "9. Your Rights (NDPR)" },
-  { id: "security", title: "10. Data Security" },
-  { id: "third-party", title: "11. Third-Party Services" },
-  { id: "children", title: "12. Children's Privacy" },
-  { id: "changes", title: "13. Changes to This Policy" },
-  { id: "contact", title: "14. Contact & DPO" },
+  { id: "scope", title: "2. Scope" },
+  { id: "collect", title: "3. Information We Collect" },
+  { id: "use", title: "4. How We Use Your Information" },
+  { id: "sharing", title: "5. Information Sharing" },
+  { id: "international", title: "6. International Data Transfers" },
+  { id: "kyc", title: "7. KYC & Identity Verification" },
+  { id: "financial", title: "8. Financial & Payment Data" },
+  { id: "cookies", title: "9. Cookies & Tracking" },
+  { id: "retention", title: "10. Data Retention" },
+  { id: "rights", title: "11. Your Rights (NDPR/NDPA)" },
+  { id: "security", title: "12. Data Security" },
+  { id: "third-party", title: "13. Third-Party Services" },
+  { id: "children", title: "14. Children's Privacy" },
+  { id: "changes", title: "15. Changes to This Policy" },
+  { id: "contact", title: "16. Contact & DPO" },
 ]
 
 export default function PrivacyPage() {
@@ -40,10 +42,19 @@ export default function PrivacyPage() {
           {EFFECTIVE_DATE}
         </p>
         <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-          At Leadsage Africa, we take your privacy seriously. This Policy
-          explains what personal data we collect, why we collect it, how we
-          use and protect it, and the rights you have under the Nigeria Data
-          Protection Regulation (NDPR) 2019 and other applicable laws.
+          LeadSage Africa ("LeadSage", "we", "our", or "us") respects your
+          privacy and is committed to protecting your personal data in
+          accordance with the{" "}
+          <strong className="text-foreground">
+            Nigeria Data Protection Act 2023 (NDPA)
+          </strong>{" "}
+          and the{" "}
+          <strong className="text-foreground">
+            Nigeria Data Protection Regulation (NDPR) 2019
+          </strong>
+          , and other applicable regulations. This Policy explains how we
+          collect, use, store, and protect your information when you use our
+          platform and services.
         </p>
       </div>
 
@@ -76,8 +87,8 @@ export default function PrivacyPage() {
             <p>
               This Privacy Policy applies to all products and services offered
               by Leadsage Africa ("Leadsage", "we", "us", "our"), including our
-              website, mobile applications, Leadsage Wallet, FirstKey Savings,
-              and related services.
+              website, web application, mobile applications (when launched),
+              Leadsage Wallet, SageNest Savings, and related services.
             </p>
             <p>
               By registering for or using Leadsage, you acknowledge that you
@@ -89,14 +100,34 @@ export default function PrivacyPage() {
               <strong className="text-foreground">
                 Nigeria Data Protection Regulation (NDPR) 2019
               </strong>{" "}
-              and the Nigeria Data Protection Act (NDPA) 2023.
+              and the{" "}
+              <strong className="text-foreground">
+                Nigeria Data Protection Act (NDPA) 2023
+              </strong>
+              .
             </p>
           </section>
 
           {/* 2 */}
+          <section id="scope" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              2. Scope
+            </h2>
+            <p>This Policy applies to:</p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Our website and web application</li>
+              <li>Mobile applications (when launched)</li>
+              <li>
+                All services including the property marketplace, artisan
+                services, and SageNest Savings
+              </li>
+            </ul>
+          </section>
+
+          {/* 3 */}
           <section id="collect" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              2. Information We Collect
+              3. Information We Collect
             </h2>
             <p>
               We collect information you provide directly, information
@@ -105,31 +136,17 @@ export default function PrivacyPage() {
             </p>
 
             <p className="font-medium text-foreground">
-              Information you provide:
+              3.1 Personal information you provide:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
                 <strong className="text-foreground">Identity data</strong> —
-                first name, last name, username, email address, phone number,
-                date of birth, gender, profile photo
+                full name, username, email address, phone number, date of
+                birth, gender, profile photo
               </li>
               <li>
                 <strong className="text-foreground">Address data</strong> —
                 country, state, city, and street address
-              </li>
-              <li>
-                <strong className="text-foreground">
-                  Identity verification data
-                </strong>{" "}
-                — Bank Verification Number (BVN), National Identification
-                Number (NIN) for landlord onboarding
-              </li>
-              <li>
-                <strong className="text-foreground">
-                  Financial & payment data
-                </strong>{" "}
-                — bank account details (for withdrawals), wallet transaction
-                history
               </li>
               <li>
                 <strong className="text-foreground">Rental preferences</strong>{" "}
@@ -142,15 +159,36 @@ export default function PrivacyPage() {
                 landlords)
               </li>
               <li>
-                <strong className="text-foreground">
-                  Communications
-                </strong>{" "}
-                — messages sent to our support team and feedback you provide
+                <strong className="text-foreground">Communications</strong> —
+                messages sent to our support team and feedback you provide
               </li>
             </ul>
 
             <p className="font-medium text-foreground">
-              Information collected automatically:
+              3.2 Identity verification data (KYC):
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Bank Verification Number (BVN)</li>
+              <li>National Identification Number (NIN)</li>
+              <li>Government-issued ID</li>
+              <li>Selfie / biometric verification</li>
+            </ul>
+
+            <p className="font-medium text-foreground">
+              3.3 Financial information:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>
+                Bank account details (for withdrawals), wallet transaction
+                history
+              </li>
+              <li>
+                Transaction history, SageNest savings data, and payment records
+              </li>
+            </ul>
+
+            <p className="font-medium text-foreground">
+              3.4 Technical data collected automatically:
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
@@ -161,9 +199,7 @@ export default function PrivacyPage() {
                 Usage data (pages viewed, features used, search queries,
                 click-through data)
               </li>
-              <li>
-                Authentication tokens and session cookies
-              </li>
+              <li>Authentication tokens and session cookies</li>
               <li>
                 Geolocation data (city/region level, if you permit it)
               </li>
@@ -178,7 +214,7 @@ export default function PrivacyPage() {
                 profile photo)
               </li>
               <li>
-                BVN verification results from our identity verification
+                BVN/NIN verification results from our identity verification
                 partner (Prembly)
               </li>
               <li>
@@ -187,10 +223,10 @@ export default function PrivacyPage() {
             </ul>
           </section>
 
-          {/* 3 */}
+          {/* 4 */}
           <section id="use" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              3. How We Use Your Information
+              4. How We Use Your Information
             </h2>
             <p>We use your personal data for the following purposes:</p>
             <ul className="list-disc space-y-2 pl-5">
@@ -213,13 +249,21 @@ export default function PrivacyPage() {
                 unauthorised access
               </li>
               <li>
+                <strong className="text-foreground">
+                  Savings & financial features
+                </strong>{" "}
+                — enabling SageNest Savings and other financial services
+              </li>
+              <li>
                 <strong className="text-foreground">Communications</strong>{" "}
                 — sending transactional emails (booking confirmations, payment
                 receipts, OTP codes), service updates, and, where you have
                 opted in, marketing messages
               </li>
               <li>
-                <strong className="text-foreground">Platform improvement</strong>{" "}
+                <strong className="text-foreground">
+                  Platform improvement
+                </strong>{" "}
                 — analysing usage patterns to improve our features, fix bugs,
                 and personalise your experience
               </li>
@@ -231,8 +275,8 @@ export default function PrivacyPage() {
             </ul>
 
             <p>
-              We process your data on the following legal bases (NDPR Article
-              2.2):
+              We process your data on the following lawful bases (NDPA/NDPR
+              compliance):
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
@@ -240,7 +284,9 @@ export default function PrivacyPage() {
                 you have expressly agreed (e.g. marketing emails, geolocation)
               </li>
               <li>
-                <strong className="text-foreground">Contract performance</strong>{" "}
+                <strong className="text-foreground">
+                  Contractual necessity
+                </strong>{" "}
                 — to fulfil our obligations to you as a user of our platform
               </li>
               <li>
@@ -248,17 +294,19 @@ export default function PrivacyPage() {
                 — KYC/AML compliance, tax reporting, and lawful orders
               </li>
               <li>
-                <strong className="text-foreground">Legitimate interests</strong>{" "}
+                <strong className="text-foreground">
+                  Legitimate interests
+                </strong>{" "}
                 — fraud prevention, platform security, and business analytics
                 (where these do not override your rights)
               </li>
             </ul>
           </section>
 
-          {/* 4 */}
+          {/* 5 */}
           <section id="sharing" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              4. Information Sharing
+              5. Information Sharing & Disclosure
             </h2>
             <p>
               We do not sell your personal data. We share your information
@@ -281,15 +329,20 @@ export default function PrivacyPage() {
                 and may not use your data for their own purposes.
               </li>
               <li>
-                <strong className="text-foreground">Legal requirements</strong>{" "}
+                <strong className="text-foreground">Financial partners</strong>{" "}
+                — licensed financial institutions holding SageNest Savings
+                funds
+              </li>
+              <li>
+                <strong className="text-foreground">
+                  Regulatory authorities
+                </strong>{" "}
                 — we may disclose your data where required by law, regulation,
                 court order, or to protect the rights and safety of Leadsage,
                 our users, or the public
               </li>
               <li>
-                <strong className="text-foreground">
-                  Business transfers
-                </strong>{" "}
+                <strong className="text-foreground">Business transfers</strong>{" "}
                 — in the event of a merger, acquisition, or asset sale, your
                 data may be transferred as part of that transaction. You will
                 be notified of any change in ownership.
@@ -297,10 +350,32 @@ export default function PrivacyPage() {
             </ul>
           </section>
 
-          {/* 5 */}
+          {/* 6 */}
+          <section id="international" className="space-y-3 scroll-mt-8">
+            <h2 className="text-base font-semibold text-foreground">
+              6. International Data Transfers
+            </h2>
+            <p>
+              Where your data is transferred outside Nigeria (for example, to
+              cloud infrastructure or third-party service providers), we
+              ensure:
+            </p>
+            <ul className="list-disc space-y-1.5 pl-5">
+              <li>Adequate data protection safeguards are in place</li>
+              <li>
+                Full compliance with NDPR/NDPA requirements for cross-border
+                data transfers
+              </li>
+              <li>
+                Data processing agreements with all recipient parties
+              </li>
+            </ul>
+          </section>
+
+          {/* 7 */}
           <section id="kyc" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              5. KYC & Identity Verification
+              7. KYC & Identity Verification
             </h2>
             <p>
               To comply with Nigerian financial regulations and to prevent
@@ -331,10 +406,10 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* 6 */}
+          {/* 8 */}
           <section id="financial" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              6. Financial & Payment Data
+              8. Financial & Payment Data
             </h2>
             <p>
               Card payment processing is handled entirely by{" "}
@@ -363,10 +438,10 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* 7 */}
+          {/* 9 */}
           <section id="cookies" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              7. Cookies & Tracking
+              9. Cookies & Tracking
             </h2>
             <p>We use the following types of cookies and similar technologies:</p>
             <ul className="list-disc space-y-2 pl-5">
@@ -381,12 +456,11 @@ export default function PrivacyPage() {
                 <strong className="text-foreground">
                   Functional cookies
                 </strong>{" "}
-                — remember your preferences (e.g. dark mode, saved filters).
+                — remember your preferences (e.g. dark mode, saved filters)
+                and personalise content.
               </li>
               <li>
-                <strong className="text-foreground">
-                  Analytics cookies
-                </strong>{" "}
+                <strong className="text-foreground">Analytics cookies</strong>{" "}
                 — help us understand how you use our platform so we can
                 improve it. These may be disabled without affecting core
                 functionality.
@@ -398,14 +472,15 @@ export default function PrivacyPage() {
                 httpOnly, secure cookies
               </strong>{" "}
               — they are not accessible to JavaScript, reducing XSS risk. We
-              do not use third-party advertising cookies.
+              do not use third-party advertising cookies. You can control
+              cookies via your browser settings.
             </p>
           </section>
 
-          {/* 8 */}
+          {/* 10 */}
           <section id="retention" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              8. Data Retention
+              10. Data Retention
             </h2>
             <p>
               We retain your personal data for as long as your account is
@@ -424,8 +499,12 @@ export default function PrivacyPage() {
                 required by Nigerian financial regulations (CBN, FIRS)
               </li>
               <li>
-                Retain data subject to an active legal dispute or regulatory
-                inquiry for the duration of that matter
+                Retain data for fraud prevention and dispute resolution
+                purposes for the duration of the relevant matter
+              </li>
+              <li>
+                Retain data subject to an active legal or regulatory inquiry
+                for the duration of that matter
               </li>
             </ul>
             <p>
@@ -434,14 +513,15 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* 9 */}
+          {/* 11 */}
           <section id="rights" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              9. Your Rights (NDPR)
+              11. Your Rights (NDPR/NDPA)
             </h2>
             <p>
-              Under the Nigeria Data Protection Regulation, you have the
-              following rights regarding your personal data:
+              Under the Nigeria Data Protection Act 2023 and the Nigeria Data
+              Protection Regulation, you have the following rights regarding
+              your personal data:
             </p>
             <ul className="list-disc space-y-2 pl-5">
               <li>
@@ -456,9 +536,7 @@ export default function PrivacyPage() {
                 or by contacting us
               </li>
               <li>
-                <strong className="text-foreground">
-                  Right to erasure
-                </strong>{" "}
+                <strong className="text-foreground">Right to erasure</strong>{" "}
                 — request deletion of your personal data, subject to legal
                 retention requirements
               </li>
@@ -469,9 +547,7 @@ export default function PrivacyPage() {
                 — receive your data in a structured, machine-readable format
               </li>
               <li>
-                <strong className="text-foreground">
-                  Right to object
-                </strong>{" "}
+                <strong className="text-foreground">Right to object</strong>{" "}
                 — object to the processing of your data for direct marketing
                 or where we rely on legitimate interests
               </li>
@@ -486,14 +562,14 @@ export default function PrivacyPage() {
             <p>
               To exercise any of these rights, please contact us at{" "}
               <a
-                href="mailto:privacy@leadsageafrica.com"
+                href="mailto:support@leadsageafrica.com"
                 className="text-primary underline underline-offset-4"
               >
-                privacy@leadsageafrica.com
+                support@leadsageafrica.com
               </a>
               . We will respond within{" "}
               <strong className="text-foreground">30 days</strong> in
-              accordance with the NDPR.
+              accordance with the NDPR/NDPA.
             </p>
             <p>
               You also have the right to lodge a complaint with the Nigeria
@@ -502,10 +578,10 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* 10 */}
+          {/* 12 */}
           <section id="security" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              10. Data Security
+              12. Data Security
             </h2>
             <p>
               We implement industry-standard technical and organisational
@@ -513,7 +589,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc space-y-1.5 pl-5">
               <li>
-                TLS/HTTPS encryption for all data in transit
+                Encryption for data at rest and in transit (TLS/HTTPS)
               </li>
               <li>
                 bcrypt hashing for passwords, OTPs, and transaction PINs
@@ -529,8 +605,8 @@ export default function PrivacyPage() {
                 Cloudflare Turnstile CAPTCHA to prevent automated attacks
               </li>
               <li>
-                Role-based access controls limiting internal data access
-                to authorised personnel only
+                Secure servers, firewalls, and role-based access controls
+                limiting internal data access to authorised personnel only
               </li>
               <li>
                 Encrypted storage for sensitive identity data (BVN references,
@@ -538,18 +614,18 @@ export default function PrivacyPage() {
               </li>
             </ul>
             <p>
-              Despite these measures, no system is 100% secure. In the event
-              of a data breach that affects your rights, we will notify you and
-              the NDPC within{" "}
+              Despite these measures, no system is 100% secure, and users
+              share data at their own risk. In the event of a data breach that
+              affects your rights, we will notify you and the NDPC within{" "}
               <strong className="text-foreground">72 hours</strong> of becoming
               aware of the incident.
             </p>
           </section>
 
-          {/* 11 */}
+          {/* 13 */}
           <section id="third-party" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              11. Third-Party Services
+              13. Third-Party Services & Links
             </h2>
             <p>
               Leadsage integrates with the following third-party services that
@@ -576,7 +652,9 @@ export default function PrivacyPage() {
                 by the CBN.
               </li>
               <li>
-                <strong className="text-foreground">Prembly (IdentityPass)</strong>{" "}
+                <strong className="text-foreground">
+                  Prembly (IdentityPass)
+                </strong>{" "}
                 — BVN and NIN verification services.
               </li>
               <li>
@@ -597,14 +675,16 @@ export default function PrivacyPage() {
             <p>
               All third-party processors are selected for their compliance
               with applicable data protection laws and are bound by data
-              processing agreements where required.
+              processing agreements where required. Our platform may also
+              contain links to third-party websites — we are not responsible
+              for their privacy practices.
             </p>
           </section>
 
-          {/* 12 */}
+          {/* 14 */}
           <section id="children" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              12. Children's Privacy
+              14. Children's Privacy
             </h2>
             <p>
               Leadsage is intended for users who are 18 years of age or older.
@@ -615,17 +695,17 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* 13 */}
+          {/* 15 */}
           <section id="changes" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              13. Changes to This Policy
+              15. Changes to This Policy
             </h2>
             <p>
               We may update this Privacy Policy periodically. We will notify
-              you of significant changes by email or through a prominent notice
-              on our platform before the change becomes effective. The "Last
-              updated" date at the top of this page will always reflect the
-              most recent revision.
+              you of significant changes via email and through a prominent
+              notice on our platform before the change becomes effective. The
+              "Last updated" date at the top of this page will always reflect
+              the most recent revision.
             </p>
             <p>
               We encourage you to review this Policy regularly to stay informed
@@ -633,10 +713,10 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* 14 */}
+          {/* 16 */}
           <section id="contact" className="space-y-3 scroll-mt-8">
             <h2 className="text-base font-semibold text-foreground">
-              14. Contact & Data Protection Officer
+              16. Contact & Data Protection Officer
             </h2>
             <p>
               If you have questions, concerns, or wish to exercise your data
@@ -645,21 +725,23 @@ export default function PrivacyPage() {
             <address className="not-italic space-y-1">
               <p className="font-medium text-foreground">Leadsage Africa</p>
               <p>
-                Privacy inquiries:{" "}
-                <a
-                  href="mailto:privacy@leadsageafrica.com"
-                  className="text-primary underline underline-offset-4"
-                >
-                  privacy@leadsageafrica.com
-                </a>
-              </p>
-              <p>
-                General support:{" "}
+                General & privacy inquiries:{" "}
                 <a
                   href="mailto:support@leadsageafrica.com"
                   className="text-primary underline underline-offset-4"
                 >
                   support@leadsageafrica.com
+                </a>
+              </p>
+              <p>
+                Website:{" "}
+                <a
+                  href="https://www.leadsageafrica.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline underline-offset-4"
+                >
+                  www.leadsageafrica.com
                 </a>
               </p>
               <p>Location: Lagos, Nigeria</p>

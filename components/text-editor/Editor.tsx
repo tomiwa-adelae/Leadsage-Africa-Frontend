@@ -6,6 +6,8 @@ import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
 import { Menubar } from "./Menubar";
 import { CustomTextStyle } from "./extensions";
 
@@ -26,6 +28,8 @@ export function RichTextEditor({ field }: { field: any }) {
         },
       }),
       CustomTextStyle,
+      Color,
+      Highlight.configure({ multicolor: true }),
       Image.configure({
         HTMLAttributes: {
           class: "max-w-full rounded-md my-4",
@@ -36,7 +40,7 @@ export function RichTextEditor({ field }: { field: any }) {
     editorProps: {
       attributes: {
         class:
-          "min-h-[350px] focus:outline-none px-5 py-4 w-full text-sm text-foreground",
+          "tiptap-editor min-h-[350px] focus:outline-none px-5 py-4 w-full text-sm text-foreground",
       },
     },
 

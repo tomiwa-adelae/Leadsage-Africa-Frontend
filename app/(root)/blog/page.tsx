@@ -1,86 +1,86 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
+import React, { useEffect, useState, useCallback } from "react"
+import Link from "next/link"
 import {
   IconLoader2,
   IconSearch,
   IconChevronLeft,
   IconChevronRight,
-} from "@tabler/icons-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+} from "@tabler/icons-react"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   getPublishedPosts,
   POST_CATEGORIES,
   type PostSummary,
   type PostCategory,
-} from "@/lib/blog-api";
-import { formatDate } from "@/lib/utils";
-import { DEFAULT_IMAGE } from "@/constants";
-import { PageHeader } from "@/components/PageHeader";
+} from "@/lib/blog-api"
+import { formatDate } from "@/lib/utils"
+import { DEFAULT_IMAGE } from "@/constants"
+import { PageHeader } from "@/components/PageHeader"
 
-const LIMIT = 9;
+const LIMIT = 9
 
 export default function BlogPage() {
-  const [posts, setPosts] = useState<PostSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<PostCategory | "">("");
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
+  const [posts, setPosts] = useState<PostSummary[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+  const [category, setCategory] = useState<PostCategory | "">("")
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
 
   const load = useCallback(
     async (currentPage: number) => {
-      setLoading(true);
+      setLoading(true)
       try {
         const res = await getPublishedPosts({
           page: currentPage,
           limit: LIMIT,
           search: search || undefined,
           category: category || undefined,
-        });
-        setPosts(res.data);
-        setTotal(res.total);
+        })
+        setPosts(res.data)
+        setTotal(res.total)
       } catch {
         // silently fail
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     },
-    [search, category],
-  );
+    [search, category]
+  )
 
   // Reset to page 1 when filters change
   useEffect(() => {
-    setPage(1);
-    const t = setTimeout(() => load(1), 300);
-    return () => clearTimeout(t);
-  }, [search, category, load]);
+    setPage(1)
+    const t = setTimeout(() => load(1), 300)
+    return () => clearTimeout(t)
+  }, [search, category, load])
 
   // Load when page changes (but not on filter change — handled above)
   useEffect(() => {
-    if (page !== 1) load(page);
+    if (page !== 1) load(page)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page])
 
-  const totalPages = Math.ceil(total / LIMIT);
+  const totalPages = Math.ceil(total / LIMIT)
 
   return (
-    <main className="container py-12 space-y-10">
+    <main className="container space-y-10 py-12">
       {/* Header */}
       <PageHeader
         title="Blogs"
-        description="News, updates, and resources from the Staxis team."
+        description="News, updates, and resources from the Leadsage Africa."
       />
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row mt-4 gap-3">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <IconSearch
             size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            className="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
           />
           <Input
             placeholder="Search articles…"
@@ -116,17 +116,17 @@ export default function BlogPage() {
           <IconLoader2 size={32} className="animate-spin opacity-20" />
         </div>
       ) : posts.length === 0 ? (
-        <div className="text-center py-32 text-muted-foreground">
+        <div className="py-32 text-center text-muted-foreground">
           No articles found.
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => (
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}
-                className="group flex flex-col rounded-xl border overflow-hidden hover:border-primary/50 transition-colors"
+                className="group flex flex-col overflow-hidden rounded-xl border transition-colors hover:border-primary/50"
               >
                 {/* Cover */}
                 <div className="aspect-video w-full overflow-hidden bg-muted">
@@ -134,12 +134,12 @@ export default function BlogPage() {
                   <img
                     src={post.coverImage || DEFAULT_IMAGE}
                     alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
 
                 {/* Body */}
-                <div className="flex flex-col flex-1 p-4 space-y-2">
+                <div className="flex flex-1 flex-col space-y-2 p-4">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs capitalize">
                       {post.category.toLowerCase()}
@@ -151,17 +151,17 @@ export default function BlogPage() {
                     )}
                   </div>
 
-                  <h2 className="font-semibold hover:underline text-base leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                  <h2 className="line-clamp-2 text-base leading-snug font-semibold transition-colors group-hover:text-primary hover:underline">
                     {post.title}
                   </h2>
 
                   {post.excerpt && (
-                    <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
+                    <p className="line-clamp-3 flex-1 text-sm text-muted-foreground">
                       {post.excerpt}
                     </p>
                   )}
 
-                  <p className="text-xs text-muted-foreground pt-1">
+                  <p className="pt-1 text-xs text-muted-foreground">
                     By {post.author.firstName} {post.author.lastName}
                   </p>
                 </div>
@@ -207,5 +207,5 @@ export default function BlogPage() {
         </>
       )}
     </main>
-  );
+  )
 }

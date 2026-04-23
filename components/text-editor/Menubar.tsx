@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { type Editor } from "@tiptap/react";
+import api from "@/lib/api";
 import {
   Tooltip,
   TooltipContent,
@@ -11,9 +12,11 @@ import {
 import { Toggle } from "../ui/toggle";
 import {
   AlignCenter,
+  AlignJustify,
   AlignLeft,
   AlignRight,
   Bold,
+  Code,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
@@ -41,7 +44,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { FONT_FAMILIES, FONT_SIZES } from "./extensions";
+import {
+  FONT_FAMILIES,
+  FONT_SIZES,
+  HIGHLIGHT_COLORS,
+  TEXT_COLORS,
+} from "./extensions";
 
 interface iAppProps {
   editor: Editor | null;
@@ -121,17 +129,64 @@ function ToolbarButton({
   );
 }
 
+// Color swatch button used inside color pickers
+function ColorSwatch({
+  color,
+  label,
+  active,
+  onClick,
+}: {
+  color: string;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={onClick}
+          className={cn(
+            "h-6 w-6 rounded border transition-all hover:scale-110",
+            active ? "ring-2 ring-primary ring-offset-1" : "border-border"
+          )}
+          style={{ backgroundColor: color === "inherit" ? "transparent" : color }}
+          aria-label={label}
+        >
+          {color === "inherit" && (
+            <span className="text-[10px] font-bold leading-none">A</span>
+          )}
+          {color === "transparent" && (
+            <span className="text-[9px] leading-none">✕</span>
+          )}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="text-xs">
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 export const Menubar = ({ editor }: iAppProps) => {
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [imageOpen, setImageOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [imageTab, setImageTab] = useState<"upload" | "url">("upload");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [colorOpen, setColorOpen] = useState(false);
+  const [highlightOpen, setHighlightOpen] = useState(false);
 
   if (!editor) return null;
 
   const textStyleAttrs = editor.getAttributes("textStyle");
   const currentFontFamily = textStyleAttrs.fontFamily ?? "default";
   const currentFontSize = textStyleAttrs.fontSize ?? "default";
+  const currentColor = textStyleAttrs.color ?? "inherit";
+  const currentHighlight = editor.getAttributes("highlight").color ?? "transparent";
 
   const openLinkPopover = () => {
     const existing = editor.getAttributes("link").href ?? "";
@@ -169,6 +224,26 @@ export const Menubar = ({ editor }: iAppProps) => {
     }
     setImageOpen(false);
     setImageUrl("");
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await api.post("/upload/editor-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      editor.chain().focus().setImage({ src: res.data.url }).run();
+      setImageOpen(false);
+    } catch {
+      // leave open so user can retry
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -232,6 +307,100 @@ export const Menubar = ({ editor }: iAppProps) => {
               ))}
             </SelectContent>
           </Select>
+
+          <ToolbarDivider />
+
+          {/* Text color picker */}
+          <Popover open={colorOpen} onOpenChange={setColorOpen}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    type="button"
+                    className="h-7 w-7 p-0 flex flex-col items-center justify-center gap-0.5"
+                  >
+                    <span className="text-xs font-bold leading-none" style={{ color: currentColor === "inherit" ? undefined : currentColor }}>A</span>
+                    <div
+                      className="h-1 w-5 rounded-sm"
+                      style={{ backgroundColor: currentColor === "inherit" ? "currentColor" : currentColor }}
+                    />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                Text color
+              </TooltipContent>
+            </Tooltip>
+            <PopoverContent className="w-auto p-3" side="bottom" align="start">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Text color</p>
+              <div className="grid grid-cols-7 gap-1.5">
+                {TEXT_COLORS.map((c) => (
+                  <ColorSwatch
+                    key={c.value}
+                    color={c.value}
+                    label={c.label}
+                    active={currentColor === c.value}
+                    onClick={() => {
+                      if (c.value === "inherit") {
+                        editor.chain().focus().unsetColor().run();
+                      } else {
+                        editor.chain().focus().setColor(c.value).run();
+                      }
+                      setColorOpen(false);
+                    }}
+                  />
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Highlight color picker */}
+          <Popover open={highlightOpen} onOpenChange={setHighlightOpen}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    type="button"
+                    className="h-7 w-7 p-0 flex flex-col items-center justify-center gap-0.5"
+                  >
+                    <span className="text-xs font-bold leading-none">H</span>
+                    <div
+                      className="h-1 w-5 rounded-sm border border-border/50"
+                      style={{ backgroundColor: currentHighlight === "transparent" ? "transparent" : currentHighlight }}
+                    />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                Highlight color
+              </TooltipContent>
+            </Tooltip>
+            <PopoverContent className="w-auto p-3" side="bottom" align="start">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Highlight color</p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {HIGHLIGHT_COLORS.map((c) => (
+                  <ColorSwatch
+                    key={c.value}
+                    color={c.value}
+                    label={c.label}
+                    active={currentHighlight === c.value}
+                    onClick={() => {
+                      if (c.value === "transparent") {
+                        editor.chain().focus().unsetHighlight().run();
+                      } else {
+                        editor.chain().focus().setHighlight({ color: c.value }).run();
+                      }
+                      setHighlightOpen(false);
+                    }}
+                  />
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* ── Row 2: Formatting controls ──────────────────────────── */}
@@ -266,6 +435,13 @@ export const Menubar = ({ editor }: iAppProps) => {
               tooltip="Strikethrough"
             >
               <Strikethrough size={14} />
+            </ToolbarToggle>
+            <ToolbarToggle
+              isActive={editor.isActive("code")}
+              onToggle={() => editor.chain().focus().toggleCode().run()}
+              tooltip="Inline code"
+            >
+              <Code size={14} />
             </ToolbarToggle>
           </div>
 
@@ -353,6 +529,15 @@ export const Menubar = ({ editor }: iAppProps) => {
             >
               <AlignRight size={14} />
             </ToolbarToggle>
+            <ToolbarToggle
+              isActive={editor.isActive({ textAlign: "justify" })}
+              onToggle={() =>
+                editor.chain().focus().setTextAlign("justify").run()
+              }
+              tooltip="Justify"
+            >
+              <AlignJustify size={14} />
+            </ToolbarToggle>
           </div>
 
           <ToolbarDivider />
@@ -429,7 +614,15 @@ export const Menubar = ({ editor }: iAppProps) => {
 
           {/* Image */}
           <div className="flex items-center gap-0.5">
-            <Popover open={imageOpen} onOpenChange={setImageOpen}>
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <Popover open={imageOpen} onOpenChange={(o) => { setImageOpen(o); if (o) setImageTab("upload"); }}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <PopoverTrigger asChild>
@@ -448,35 +641,93 @@ export const Menubar = ({ editor }: iAppProps) => {
                 </TooltipContent>
               </Tooltip>
               <PopoverContent className="w-80 p-3" side="bottom" align="start">
-                <div className="flex flex-col gap-2">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Insert image by URL
-                  </p>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="https://example.com/image.png"
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          insertImage();
-                        }
-                      }}
-                      className="h-8 text-xs"
-                      autoFocus
-                    />
+                {/* Tabs */}
+                <div className="flex gap-1 mb-3 border-b border-border pb-2">
+                  <button
+                    type="button"
+                    onClick={() => setImageTab("upload")}
+                    className={cn(
+                      "text-xs px-2 py-1 rounded transition-colors",
+                      imageTab === "upload"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageTab("url")}
+                    className={cn(
+                      "text-xs px-2 py-1 rounded transition-colors",
+                      imageTab === "url"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    From URL
+                  </button>
+                </div>
+
+                {imageTab === "upload" ? (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs text-muted-foreground">
+                      Choose an image from your device
+                    </p>
                     <Button
                       size="sm"
                       type="button"
-                      className="h-8 shrink-0 text-xs px-3"
-                      onClick={insertImage}
-                      disabled={!imageUrl.trim()}
+                      className="w-full text-xs"
+                      disabled={uploading}
+                      onClick={() => fileInputRef.current?.click()}
                     >
-                      Insert
+                      {uploading ? (
+                        <span className="flex items-center gap-1.5">
+                          <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                          </svg>
+                          Uploading…
+                        </span>
+                      ) : (
+                        <>
+                          <ImageIcon size={13} className="mr-1.5" />
+                          Choose image
+                        </>
+                      )}
                     </Button>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs text-muted-foreground">
+                      Paste an image URL
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="https://example.com/image.png"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            insertImage();
+                          }
+                        }}
+                        className="h-8 text-xs"
+                        autoFocus
+                      />
+                      <Button
+                        size="sm"
+                        type="button"
+                        className="h-8 shrink-0 text-xs px-3"
+                        onClick={insertImage}
+                        disabled={!imageUrl.trim()}
+                      >
+                        Insert
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </PopoverContent>
             </Popover>
           </div>

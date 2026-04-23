@@ -31,7 +31,8 @@ export const listingsLinks: NavLink[] = [
   {
     label: "Long-term Rentals",
     href: "/listings?type=LONG_TERM",
-    description: "Apartments, duplexes and houses for long-term rent across Nigeria",
+    description:
+      "Apartments, duplexes and houses for long-term rent across Nigeria",
   },
   {
     label: "Shortlets",
@@ -47,5 +48,13 @@ export const listingsLinks: NavLink[] = [
     label: "Hotel Rooms",
     href: "/listings?type=HOTEL_ROOM",
     description: "Comfortable and verified hotel accommodations",
+  },
+]
+
+export const resourcesLinks: NavLink[] = [
+  {
+    label: "Blog",
+    href: "/blog",
+    description: "News, updates, and resources from the Leadsage Africa",
   },
 ]

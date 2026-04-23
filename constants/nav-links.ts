@@ -15,6 +15,7 @@ import {
   IconClipboardCheck,
   IconWallet,
   IconPigMoney,
+  IconArticle,
 } from "@tabler/icons-react"
 
 // ── Tenant / CLIENT nav ────────────────────────────────────────────────────────
@@ -154,6 +155,11 @@ export const adminNavLinks = [
     slug: "/admin/users",
     icon: IconUsers,
     module: "users",
+  },
+  {
+    label: "Blogs",
+    slug: "/admin/blog",
+    icon: IconArticle,
   },
   {
     label: "Admin Team",

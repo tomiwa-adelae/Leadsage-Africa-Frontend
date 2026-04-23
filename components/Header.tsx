@@ -13,7 +13,12 @@ import {
 import { Logo } from "@/components/Logo"
 import { MobileNavbar } from "@/components/MobileNavbar"
 import { UserDropdown } from "@/components/UserDropdown"
-import { listingsLinks, savingsLinks, type NavLink } from "@/constants/nav"
+import {
+  listingsLinks,
+  resourcesLinks,
+  savingsLinks,
+  type NavLink,
+} from "@/constants/nav"
 import { useAuth } from "@/store/useAuth"
 import { cn } from "@/lib/utils"
 
@@ -52,7 +57,7 @@ export function Header() {
         <NavigationMenu viewport={false} className="hidden lg:flex">
           <NavigationMenuList className="gap-1">
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-sm font-medium text-white hover:text-primary bg-transparent hover:bg-white/10 data-active:bg-white/10">
+              <NavigationMenuTrigger className="bg-transparent text-sm font-medium text-white hover:bg-white/10 hover:text-primary data-active:bg-white/10">
                 Savings
               </NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -65,12 +70,25 @@ export function Header() {
             </NavigationMenuItem>
 
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-sm font-medium text-white hover:text-primary bg-transparent hover:bg-white/10 data-active:bg-white/10">
+              <NavigationMenuTrigger className="bg-transparent text-sm font-medium text-white hover:bg-white/10 hover:text-primary data-active:bg-white/10">
                 Listings
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-120 grid-cols-2 gap-1 p-3">
                   {listingsLinks.map((link) => (
+                    <DropdownItem key={link.href} {...link} />
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="bg-transparent text-sm font-medium text-white hover:bg-white/10 hover:text-primary data-active:bg-white/10">
+                Resources
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-120 grid-cols-2 gap-1 p-3">
+                  {resourcesLinks.map((link) => (
                     <DropdownItem key={link.href} {...link} />
                   ))}
                 </ul>

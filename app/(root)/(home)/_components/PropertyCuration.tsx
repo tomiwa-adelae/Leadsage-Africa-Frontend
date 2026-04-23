@@ -18,7 +18,7 @@ const FEATURES = [
     icon: IconHome,
     title: "Acquire",
     description:
-      "From document verification to digital lease signing — finalise your rental entirely through our secure digital platform.",
+      "From document verification to digital lease signing finalize your rental entirely through our secure digital platform.",
   },
 ]
 
@@ -28,21 +28,32 @@ const STATS = [
     value: "200+",
     top: "top-16",
     left: "-left-4 sm:-left-10",
-    avatars: ["/assets/images/profile-img.jpg", "/assets/images/profile-img.jpg", "/assets/images/profile-img.jpg"],
+    avatars: [
+      "/assets/images/profile-img.jpg",
+      "/assets/images/profile-img.jpg",
+      "/assets/images/profile-img.jpg",
+    ],
   },
   {
     label: "Listings",
     value: "12+",
     top: "top-1/2 -translate-y-1/2",
     left: "right-0 sm:-right-8",
-    avatars: ["/assets/images/profile-img.jpg", "/assets/images/profile-img.jpg"],
+    avatars: [
+      "/assets/images/profile-img.jpg",
+      "/assets/images/profile-img.jpg",
+    ],
   },
   {
     label: "Happy Customers",
     value: "50+",
     top: "bottom-16",
     left: "-left-4 sm:-left-10",
-    avatars: ["/assets/images/profile-img.jpg", "/assets/images/profile-img.jpg", "/assets/images/profile-img.jpg"],
+    avatars: [
+      "/assets/images/profile-img.jpg",
+      "/assets/images/profile-img.jpg",
+      "/assets/images/profile-img.jpg",
+    ],
   },
 ]
 
@@ -56,7 +67,7 @@ function StatBadge({
   avatars: string[]
 }) {
   return (
-    <div className="flex items-center gap-2.5 rounded-2xl bg-white dark:bg-card border shadow-lg px-3 py-2.5 w-max">
+    <div className="flex w-max items-center gap-2.5 rounded-2xl border bg-white px-3 py-2.5 shadow-lg dark:bg-card">
       {/* Stacked avatars */}
       <div className="flex -space-x-2">
         {avatars.map((src, i) => (
@@ -69,8 +80,10 @@ function StatBadge({
         ))}
       </div>
       <div>
-        <p className="text-xs font-bold text-foreground leading-none">{value}</p>
-        <p className="text-[10px] text-muted-foreground mt-0.5">{label}</p>
+        <p className="text-xs leading-none font-bold text-foreground">
+          {value}
+        </p>
+        <p className="mt-0.5 text-[10px] text-muted-foreground">{label}</p>
       </div>
     </div>
   )
@@ -78,14 +91,16 @@ function StatBadge({
 
 export function PropertyCuration() {
   return (
-    <section className="bg-muted/40 py-14 overflow-hidden">
+    <section className="overflow-hidden bg-muted/40 py-14">
       <div className="container">
         {/* Heading */}
-        <div className="text-center mb-12 max-w-xl mx-auto">
-          <h2 className="text-2xl font-bold md:text-3xl">Seamless property curation</h2>
-          <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-            We re-define the journey of finding your next home. Our three-stage approach keeps
-            everything intentional, transparent, and stress-free.
+        <div className="mx-auto mb-12 max-w-xl text-center">
+          <h2 className="text-2xl font-bold md:text-3xl">
+            Seamless property curation
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            We re-define the journey of finding your next home. Our three-stage
+            approach keeps everything intentional, transparent, and stress-free.
           </p>
         </div>
 
@@ -94,12 +109,12 @@ export function PropertyCuration() {
           <div className="flex flex-col gap-8">
             {FEATURES.map(({ icon: Icon, title, description }) => (
               <div key={title} className="flex gap-4">
-                <div className="shrink-0 flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
                   <Icon className="size-5 text-primary" />
                 </div>
                 <div>
                   <p className="font-semibold">{title}</p>
-                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {description}
                   </p>
                 </div>
@@ -110,7 +125,7 @@ export function PropertyCuration() {
           {/* Right: phone mockup + floating badges */}
           <div className="relative flex justify-center">
             {/* Subtle glow behind phone */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <div className="size-72 rounded-full bg-primary/10 blur-3xl" />
             </div>
 
@@ -121,12 +136,12 @@ export function PropertyCuration() {
                 alt="Leadsage mobile app"
                 width={400}
                 height={800}
-                className="w-full drop-shadow-2xl rounded-[2.5rem]"
+                className="w-full rounded-[2.5rem] drop-shadow-2xl"
               />
             </div>
 
             {/* Floating badge — top left */}
-            <div className="absolute top-8 left-0 sm:-left-6 z-20 animate-none">
+            <div className="absolute top-8 left-0 z-20 animate-none sm:-left-6">
               <StatBadge
                 label="Total Houses"
                 value="200+"
@@ -139,7 +154,7 @@ export function PropertyCuration() {
             </div>
 
             {/* Floating badge — middle right */}
-            <div className="absolute top-1/2 -translate-y-1/2 right-0 sm:-right-6 z-20">
+            <div className="absolute top-1/2 right-0 z-20 -translate-y-1/2 sm:-right-6">
               <StatBadge
                 label="Listings"
                 value="12+"
@@ -151,7 +166,7 @@ export function PropertyCuration() {
             </div>
 
             {/* Floating badge — bottom left */}
-            <div className="absolute bottom-8 left-0 sm:-left-6 z-20">
+            <div className="absolute bottom-8 left-0 z-20 sm:-left-6">
               <StatBadge
                 label="Happy Customers"
                 value="50+"

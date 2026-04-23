@@ -48,29 +48,38 @@ const CATEGORIES = [
 export function BrowseCategories() {
   return (
     <section className="container py-14">
-      <div className="text-center mb-8">
+      <div className="mb-8 text-center">
         <h2 className="text-2xl font-bold md:text-3xl">Browse by type</h2>
         <p className="mt-2 text-muted-foreground">
-          Find exactly what you need — from a studio shortlet to a long-term family home.
+          Find exactly what you need from a studio shortlet to a long-term
+          family home.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {CATEGORIES.map(({ label, description, href, icon: Icon, bg, iconColor, border }) => (
-          <Link
-            key={href}
-            href={href}
-            className={`group flex flex-col gap-4 rounded-2xl border p-5 transition-all hover:shadow-md hover:-translate-y-0.5 ${bg} ${border}`}
-          >
-            <div className={`inline-flex size-11 items-center justify-center rounded-xl bg-white dark:bg-black/20 shadow-sm ${iconColor}`}>
-              <Icon className="size-5" />
-            </div>
-            <div>
-              <p className="font-semibold text-sm group-hover:text-primary transition-colors">{label}</p>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{description}</p>
-            </div>
-          </Link>
-        ))}
+        {CATEGORIES.map(
+          ({ label, description, href, icon: Icon, bg, iconColor, border }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`group flex flex-col gap-4 rounded-2xl border p-5 transition-all hover:-translate-y-0.5 hover:shadow-md ${bg} ${border}`}
+            >
+              <div
+                className={`inline-flex size-11 items-center justify-center rounded-xl bg-white shadow-sm dark:bg-black/20 ${iconColor}`}
+              >
+                <Icon className="size-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold transition-colors group-hover:text-primary">
+                  {label}
+                </p>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          )
+        )}
       </div>
     </section>
   )

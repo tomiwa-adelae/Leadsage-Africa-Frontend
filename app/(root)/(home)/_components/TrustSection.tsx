@@ -72,11 +72,13 @@ function TestimonialCard({
   quote,
 }: (typeof TESTIMONIALS)[number]) {
   return (
-    <div className="w-72 shrink-0 flex flex-col gap-3 rounded-2xl bg-white/10 border border-white/10 p-5">
+    <div className="flex w-72 shrink-0 flex-col gap-3 rounded-2xl border border-white/10 bg-white/10 p-5">
       <StarRating rating={rating} />
-      <p className="text-sm text-white/80 leading-relaxed line-clamp-4">{quote}</p>
-      <div className="flex items-center gap-2.5 pt-2 border-t border-white/10">
-        <div className="relative size-8 overflow-hidden rounded-full shrink-0">
+      <p className="line-clamp-4 text-sm leading-relaxed text-white/80">
+        {quote}
+      </p>
+      <div className="flex items-center gap-2.5 border-t border-white/10 pt-2">
+        <div className="relative size-8 shrink-0 overflow-hidden rounded-full">
           <Image
             src="/assets/images/profile-img.jpg"
             alt={name}
@@ -102,9 +104,9 @@ const AVATARS = [
 
 export function TrustSection() {
   return (
-    <section className="bg-primary py-14 overflow-hidden">
+    <section className="overflow-hidden bg-primary py-14">
       <div className="container">
-        <div className="grid items-center gap-10 lg:grid-cols-3 mb-12">
+        <div className="mb-12 grid items-center gap-10 lg:grid-cols-3">
           {/* Left: social proof */}
           <div className="flex flex-col gap-4">
             <div className="flex -space-x-2">
@@ -113,7 +115,12 @@ export function TrustSection() {
                   key={i}
                   className="relative size-9 overflow-hidden rounded-full border-2 border-primary"
                 >
-                  <Image src={src} alt="customer" fill className="object-cover" />
+                  <Image
+                    src={src}
+                    alt="customer"
+                    fill
+                    className="object-cover"
+                  />
                 </div>
               ))}
               <div className="flex size-9 items-center justify-center rounded-full border-2 border-primary bg-white/15 text-[10px] font-bold text-white">
@@ -121,11 +128,13 @@ export function TrustSection() {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-white md:text-3xl">
-              Trusted by over<br />50+ homeowners.
+              Trusted by over
+              <br />
+              50+ homeowners.
             </h2>
-            <p className="text-sm text-white/60 leading-relaxed max-w-xs">
-              Renters, landlords, and student savers across Nigeria rely on Leadsage every day to
-              manage their housing journey.
+            <p className="max-w-xs text-sm leading-relaxed text-white/60">
+              Renters, landlords, and student savers across Nigeria rely on
+              Leadsage every day to manage their housing journey.
             </p>
           </div>
 
@@ -133,21 +142,25 @@ export function TrustSection() {
           <div className="hidden lg:block" />
 
           {/* Right: CTA */}
-          <div className="flex flex-col gap-2 lg:text-right lg:items-end">
-            <h3 className="text-3xl font-bold text-white md:text-4xl leading-tight">
-              Ready to curate<br />your next<br />chapter?
+          <div className="flex flex-col gap-2 lg:items-end lg:text-right">
+            <h3 className="text-3xl leading-tight font-bold text-white md:text-4xl">
+              Ready to curate
+              <br />
+              your next
+              <br />
+              chapter?
             </h3>
           </div>
         </div>
       </div>
 
       {/* Marquee — full bleed */}
-      <div className="relative w-full overflow-hidden mb-12">
+      <div className="relative mb-12 w-full overflow-hidden">
         {/* Fade edges */}
-        <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-primary to-transparent" />
-        <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-primary to-transparent" />
+        <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-24 bg-gradient-to-r from-primary to-transparent" />
+        <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-24 bg-gradient-to-l from-primary to-transparent" />
 
-        <div className="flex gap-4 animate-marquee w-max">
+        <div className="animate-marquee flex w-max gap-4">
           {TRACK.map((t, i) => (
             <TestimonialCard key={i} {...t} />
           ))}
@@ -165,7 +178,7 @@ export function TrustSection() {
               variant="outline"
               size="sm"
               asChild
-              className="border-white/30 text-white hover:bg-white/10 hover:text-white"
+              // className="border-white/30  hover:bg-white/10 hover:text-white"
             >
               <Link href="/landlord/listings/new">List Your Property</Link>
             </Button>
@@ -178,11 +191,15 @@ export function TrustSection() {
               className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white transition-colors hover:bg-white/15"
             >
               <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3.18 23.76A2 2 0 0 1 2 22V2a2 2 0 0 1 1.18-1.76l11.65 11.65L3.18 23.76zM16.5 8.5 5.34 2.07l9.42 9.42L16.5 8.5zm3.32 5.14c.68-.39.68-1.39 0-1.78L17.7 10.5l-2.18 2.17 2.18 2.18 2.12-1.21zM5.34 21.93l11.16-6.43-1.74-1.74-9.42 9.42-.0001-.0001z"/>
+                <path d="M3.18 23.76A2 2 0 0 1 2 22V2a2 2 0 0 1 1.18-1.76l11.65 11.65L3.18 23.76zM16.5 8.5 5.34 2.07l9.42 9.42L16.5 8.5zm3.32 5.14c.68-.39.68-1.39 0-1.78L17.7 10.5l-2.18 2.17 2.18 2.18 2.12-1.21zM5.34 21.93l11.16-6.43-1.74-1.74-9.42 9.42-.0001-.0001z" />
               </svg>
               <div className="text-left">
-                <p className="text-[9px] text-white/60 leading-none">Get it on</p>
-                <p className="text-xs font-semibold leading-tight">Google Play</p>
+                <p className="text-[9px] leading-none text-white/60">
+                  Get it on
+                </p>
+                <p className="text-xs leading-tight font-semibold">
+                  Google Play
+                </p>
               </div>
             </a>
 
@@ -192,11 +209,13 @@ export function TrustSection() {
               className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-white transition-colors hover:bg-white/15"
             >
               <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
               </svg>
               <div className="text-left">
-                <p className="text-[9px] text-white/60 leading-none">Download on the</p>
-                <p className="text-xs font-semibold leading-tight">App Store</p>
+                <p className="text-[9px] leading-none text-white/60">
+                  Download on the
+                </p>
+                <p className="text-xs leading-tight font-semibold">App Store</p>
               </div>
             </a>
           </div>

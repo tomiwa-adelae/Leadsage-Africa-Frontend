@@ -16,6 +16,7 @@ import {
   IconFileText,
   IconUserCheck,
   IconPigMoney,
+  IconArticle,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -75,6 +76,11 @@ const mainLinks = [
     label: "FirstKey Savings",
     href: "/admin/savings",
     icon: IconPigMoney,
+  },
+  {
+    label: "Blogs",
+    href: "/admin/blog",
+    icon: IconArticle,
   },
 ]
 

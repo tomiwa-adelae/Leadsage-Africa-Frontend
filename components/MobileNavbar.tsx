@@ -19,7 +19,12 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { IconChevronDown, IconMenu2, IconLogout } from "@tabler/icons-react"
 import { Logo } from "@/components/Logo"
-import { listingsLinks, savingsLinks, type NavLink } from "@/constants/nav"
+import {
+  listingsLinks,
+  resourcesLinks,
+  savingsLinks,
+  type NavLink,
+} from "@/constants/nav"
 import { useAuth } from "@/store/useAuth"
 import { useSignout } from "@/hooks/use-signout"
 import { DEFAULT_PROFILE_IMAGE } from "@/constants"
@@ -207,6 +212,11 @@ export function MobileNavbar() {
             <CollapsibleNavSection
               label="Listings"
               links={listingsLinks}
+              onClose={close}
+            />
+            <CollapsibleNavSection
+              label="Resources"
+              links={resourcesLinks}
               onClose={close}
             />
           </div>

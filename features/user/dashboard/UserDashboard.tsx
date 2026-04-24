@@ -660,8 +660,8 @@ export function UserDashboard() {
 
         {/* Agreements quick-access */}
         <div className="space-y-3">
-          <Card className="cursor-pointer transition-shadow hover:shadow-md" asChild>
-            <Link href="/agreements">
+          <Link href="/agreements">
+            <Card className="cursor-pointer transition-shadow hover:shadow-md">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="rounded-xl bg-green-100 p-3 dark:bg-green-900/30">
                   <IconCircleCheckFilled className="size-6 text-green-600 dark:text-green-400" />
@@ -676,11 +676,11 @@ export function UserDashboard() {
                 </div>
                 <IconArrowRight className="size-4 text-muted-foreground" />
               </CardContent>
-            </Link>
-          </Card>
+            </Card>
+          </Link>
 
-          <Card className="cursor-pointer transition-shadow hover:shadow-md" asChild>
-            <Link href="/rental-payments">
+          <Link href="/rental-payments">
+            <Card className="cursor-pointer transition-shadow hover:shadow-md">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="rounded-xl bg-primary/10 p-3">
                   <IconCurrencyNaira className="size-6 text-primary" />
@@ -691,11 +691,11 @@ export function UserDashboard() {
                 </div>
                 <IconArrowRight className="size-4 text-muted-foreground" />
               </CardContent>
-            </Link>
-          </Card>
+            </Card>
+          </Link>
 
-          <Card className="cursor-pointer transition-shadow hover:shadow-md" asChild>
-            <Link href="/saved">
+          <Link href="/saved">
+            <Card className="cursor-pointer transition-shadow hover:shadow-md">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="rounded-xl bg-rose-100 p-3 dark:bg-rose-900/30">
                   <IconBookmark className="size-6 text-rose-500 dark:text-rose-400" />
@@ -710,8 +710,8 @@ export function UserDashboard() {
                 </div>
                 <IconArrowRight className="size-4 text-muted-foreground" />
               </CardContent>
-            </Link>
-          </Card>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>

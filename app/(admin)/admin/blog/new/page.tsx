@@ -220,7 +220,7 @@ export default function NewPostPage() {
         title: values.title,
         body: values.body,
         excerpt: values.excerpt || undefined,
-        coverImage: values.coverImage ?? null,
+        coverImage: values.coverImage || undefined,
         category: values.category as PostCategory,
         tags: values.tags
           ? values.tags
@@ -245,7 +245,7 @@ export default function NewPostPage() {
         title: values.title,
         body: values.body,
         excerpt: values.excerpt || undefined,
-        coverImage: values.coverImage ?? null,
+        coverImage: values.coverImage || undefined,
         category: values.category as PostCategory,
         tags: values.tags
           ? values.tags

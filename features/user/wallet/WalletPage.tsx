@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   IconLoader2,
   IconCopy,
@@ -144,6 +144,11 @@ export function WalletPage() {
   const [verifyingBank, setVerifyingBank] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
 
+  // KYC auto-sync
+  const [syncing, setSyncing] = useState(false)
+  const syncAttempts = useRef(0)
+  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // PIN modals
   const [showSetPin, setShowSetPin] = useState(false)
   const [showPinModal, setShowPinModal] = useState(false)
@@ -164,15 +169,49 @@ export function WalletPage() {
       setWallet(w)
       setTxs(t)
       if (!w.transactionPinSet) setShowSetPin(true)
+      if (w.kycStatus === "SUBMITTED" || w.kycStatus === "FAILED") {
+        syncAttempts.current = 0
+        startAutoSync()
+      }
     } catch {
       toast.error("Failed to load wallet")
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function startAutoSync() {
+    if (syncTimer.current) clearTimeout(syncTimer.current)
+    syncAttempts.current = 0
+    runSync()
+  }
+
+  async function runSync() {
+    if (syncAttempts.current >= 6) {
+      setSyncing(false)
+      return
+    }
+    setSyncing(true)
+    try {
+      const result = await postData<{ status: string }>("/wallet/kyc/sync")
+      if (result.status === "VERIFIED") {
+        setSyncing(false)
+        await load()
+        toast.success("Wallet activated successfully!")
+        return
+      }
+    } catch {
+      // non-fatal — keep polling
+    }
+    syncAttempts.current += 1
+    syncTimer.current = setTimeout(runSync, 8000)
+  }
 
   useEffect(() => {
     load()
+    return () => {
+      if (syncTimer.current) clearTimeout(syncTimer.current)
+    }
   }, [load])
 
   function copyAccountNumber() {
@@ -194,9 +233,9 @@ export function WalletPage() {
         dateOfBirth: kycForm.dateOfBirth,
         gender: kycForm.gender,
       })
-      toast.success("KYC submitted — your wallet is being activated")
       setShowKyc(false)
-      load()
+      setWallet((w) => w ? { ...w, kycStatus: "SUBMITTED" } : w)
+      startAutoSync()
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "KYC submission failed")
     } finally {
@@ -292,23 +331,33 @@ export function WalletPage() {
       {!isActive && (
         <div className="flex items-start justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900 dark:bg-amber-950/30">
           <div className="flex items-start gap-3">
-            <IconAlertCircle className="mt-0.5 size-5 shrink-0 text-amber-600" />
+            {syncing ? (
+              <IconLoader2 className="mt-0.5 size-5 shrink-0 animate-spin text-amber-600" />
+            ) : (
+              <IconAlertCircle className="mt-0.5 size-5 shrink-0 text-amber-600" />
+            )}
             <div>
               <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
-                {wallet.kycStatus === "SUBMITTED"
-                  ? "KYC under review"
-                  : wallet.kycStatus === "FAILED"
-                    ? "KYC failed — please try again"
-                    : "Activate your wallet"}
+                {syncing
+                  ? "Verifying your identity…"
+                  : wallet.kycStatus === "SUBMITTED"
+                    ? "Verification in progress"
+                    : wallet.kycStatus === "FAILED"
+                      ? "Verification failed — please try again"
+                      : "Activate your wallet"}
               </p>
               <p className="text-xs text-amber-700 dark:text-amber-400">
-                {wallet.kycStatus === "SUBMITTED"
-                  ? "Your BVN is being verified. This usually takes a few minutes."
-                  : "Submit your BVN to activate deposits, payments, and withdrawals."}
+                {syncing
+                  ? "Checking your BVN with your bank. This usually takes under a minute."
+                  : wallet.kycStatus === "SUBMITTED"
+                    ? "Still processing — we'll activate your wallet automatically when done."
+                    : wallet.kycStatus === "FAILED"
+                      ? "Your BVN details could not be verified. Please check and resubmit."
+                      : "Submit your BVN to activate deposits, payments, and withdrawals."}
               </p>
             </div>
           </div>
-          {wallet.kycStatus !== "SUBMITTED" && (
+          {!syncing && wallet.kycStatus !== "SUBMITTED" && (
             <Button size="sm" onClick={() => setShowKyc(true)}>
               <IconShieldCheck className="size-3.5" />
               Verify BVN

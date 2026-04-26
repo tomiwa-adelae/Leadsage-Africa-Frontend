@@ -39,6 +39,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   AlertDialog,
@@ -253,14 +254,10 @@ function RefundDialog({
                   <span className="absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">
                     ₦
                   </span>
-                  <Input
-                    type="number"
+                  <CurrencyInput
                     className="pl-7"
                     value={customAmount}
-                    onChange={(e) => {
-                      setCustomAmount(e.target.value)
-                      setPercent(null)
-                    }}
+                    onChange={(v) => { setCustomAmount(v); setPercent(null) }}
                   />
                 </div>
               </div>

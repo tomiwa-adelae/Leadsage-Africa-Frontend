@@ -24,6 +24,7 @@ import { toast } from "sonner"
 import { postData, fetchData } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -509,12 +510,11 @@ function StepFrequency({
         <Label>
           Amount per {form.frequency?.toLowerCase() ?? "contribution"} (₦)
         </Label>
-        <Input
-          type="number"
+        <CurrencyInput
           min={100}
           value={form.contributionAmount}
-          onChange={(e) => onChange("contributionAmount", e.target.value)}
-          placeholder="e.g. 5000"
+          onChange={(v) => onChange("contributionAmount", v)}
+          placeholder="e.g. 5,000"
           className="max-w-xs"
         />
         {form.frequency === "WEEKLY" && form.contributionAmount && (
@@ -550,11 +550,10 @@ function StepTarget({
 
       <div className="space-y-1">
         <Label>Target amount (₦)</Label>
-        <Input
-          type="number"
+        <CurrencyInput
           min={0}
           value={form.savingsTarget}
-          onChange={(e) => onChange("savingsTarget", e.target.value)}
+          onChange={(v) => onChange("savingsTarget", v)}
           placeholder="0"
           className="max-w-xs"
         />

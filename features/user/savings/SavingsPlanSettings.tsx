@@ -19,6 +19,7 @@ import { PageHeader } from "@/components/PageHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import { Label } from "@/components/ui/label"
 import {
   Popover,
@@ -336,11 +337,10 @@ export function SavingsPlanSettings({ id }: { id: string }) {
             <Label className="text-xs">
               Amount per {frequency.toLowerCase()} (₦)
             </Label>
-            <Input
-              type="number"
+            <CurrencyInput
               min={100}
               value={contributionAmount}
-              onChange={(e) => setContributionAmount(e.target.value)}
+              onChange={setContributionAmount}
               className="max-w-xs"
             />
             {frequency === "WEEKLY" && contributionAmount && (
@@ -365,12 +365,11 @@ export function SavingsPlanSettings({ id }: { id: string }) {
         <CardContent className="space-y-3">
           <div className="space-y-1">
             <Label className="text-xs">Target amount (₦, optional)</Label>
-            <Input
-              type="number"
+            <CurrencyInput
               min={0}
               value={savingsTarget}
-              onChange={(e) => setSavingsTarget(e.target.value)}
-              placeholder="e.g. 500000"
+              onChange={setSavingsTarget}
+              placeholder="e.g. 500,000"
               className="max-w-xs"
             />
           </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import {
   IconLoader2,
   IconCopy,
@@ -11,7 +12,11 @@ import {
   IconShieldCheck,
   IconAlertCircle,
   IconBuildingBank,
+  IconCreditCard,
+  IconRefresh,
+  IconPlus,
 } from "@tabler/icons-react"
+import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 import { fetchData, postData } from "@/lib/api"
@@ -20,16 +25,16 @@ import { SetPinModal } from "@/components/SetPinModal"
 import { PinModal } from "@/components/PinModal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -119,10 +124,19 @@ const BANKS = [
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export function WalletPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [wallet, setWallet] = useState<WalletAccount | null>(null)
   const [txs, setTxs] = useState<WalletTx[]>([])
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+
+  // Top-up dialog
+  const [showTopup, setShowTopup] = useState(false)
+  const [topupMethod, setTopupMethod] = useState<"bank" | "card">("bank")
+  const [topupAmount, setTopupAmount] = useState("")
+  const [topupLoading, setTopupLoading] = useState(false)
+  const [syncingBalance, setSyncingBalance] = useState(false)
 
   // KYC dialog
   const [showKyc, setShowKyc] = useState(false)
@@ -149,6 +163,10 @@ export function WalletPage() {
   const syncAttempts = useRef(0)
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Balance polling (after "I've made the transfer")
+  const balanceSyncAttempts = useRef(0)
+  const balanceSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // PIN modals
   const [showSetPin, setShowSetPin] = useState(false)
   const [showPinModal, setShowPinModal] = useState(false)
@@ -173,6 +191,26 @@ export function WalletPage() {
         syncAttempts.current = 0
         startAutoSync()
       }
+      // Silent balance sync on every page load — catches missed webhooks
+      if (w.isActive) {
+        postData<{ synced: boolean; credited?: number }>("/wallet/sync", {})
+          .then((res) => {
+            if (res.synced && res.credited) {
+              setWallet((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      availableBalance: prev.availableBalance + res.credited!,
+                    }
+                  : prev
+              )
+              fetchData<WalletTx[]>("/wallet/transactions")
+                .then(setTxs)
+                .catch(() => {})
+            }
+          })
+          .catch(() => {})
+      }
     } catch {
       toast.error("Failed to load wallet")
     } finally {
@@ -193,7 +231,7 @@ export function WalletPage() {
     }
     setSyncing(true)
     try {
-      const result = await postData<{ status: string }>("/wallet/kyc/sync")
+      const result = await postData<{ status: string }>("/wallet/kyc/sync", {})
       if (result.status === "VERIFIED") {
         setSyncing(false)
         await load()
@@ -211,8 +249,82 @@ export function WalletPage() {
     load()
     return () => {
       if (syncTimer.current) clearTimeout(syncTimer.current)
+      if (balanceSyncTimer.current) clearTimeout(balanceSyncTimer.current)
     }
   }, [load])
+
+  // Auto-verify card top-up when Paystack redirects back with ?verify=<ref>
+  useEffect(() => {
+    const ref = searchParams.get("verify")
+    if (!ref) return
+    router.replace("/wallet", { scroll: false })
+    postData<{ success: boolean; amount?: number; alreadyVerified?: boolean }>(
+      "/wallet/topup/card/verify",
+      { reference: ref }
+    )
+      .then((res) => {
+        if (!res.alreadyVerified && res.amount) {
+          toast.success(`₦${res.amount.toLocaleString()} added to your wallet!`)
+          load()
+        }
+      })
+      .catch(() => toast.error("Could not verify card payment"))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleCardTopup() {
+    const n = parseFloat(topupAmount)
+    if (!n || n < 100) {
+      toast.error("Minimum top-up is ₦100")
+      return
+    }
+    setTopupLoading(true)
+    try {
+      const { paymentUrl } = await postData<{ paymentUrl: string }>(
+        "/wallet/topup/card",
+        { amount: n }
+      )
+      window.location.href = paymentUrl
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message ?? "Could not initialize payment"
+      )
+      setTopupLoading(false)
+    }
+  }
+
+  function startBalanceSync() {
+    if (balanceSyncTimer.current) clearTimeout(balanceSyncTimer.current)
+    balanceSyncAttempts.current = 0
+    setSyncingBalance(true)
+    runBalanceSync()
+  }
+
+  async function runBalanceSync() {
+    if (balanceSyncAttempts.current >= 12) {
+      setSyncingBalance(false)
+      toast.info(
+        "Transfer not detected yet — it will reflect automatically once confirmed."
+      )
+      return
+    }
+    try {
+      const res = await postData<{ synced: boolean; credited?: number }>(
+        "/wallet/sync",
+        {}
+      )
+      if (res.synced && res.credited) {
+        setSyncingBalance(false)
+        toast.success(`₦${res.credited.toLocaleString()} transfer confirmed!`)
+        setShowTopup(false)
+        load()
+        return
+      }
+    } catch {
+      // non-fatal — keep polling
+    }
+    balanceSyncAttempts.current += 1
+    balanceSyncTimer.current = setTimeout(runBalanceSync, 5000)
+  }
 
   function copyAccountNumber() {
     if (!wallet?.virtualAccountNo) return
@@ -234,7 +346,7 @@ export function WalletPage() {
         gender: kycForm.gender,
       })
       setShowKyc(false)
-      setWallet((w) => w ? { ...w, kycStatus: "SUBMITTED" } : w)
+      setWallet((w) => (w ? { ...w, kycStatus: "SUBMITTED" } : w))
       startAutoSync()
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "KYC submission failed")
@@ -295,7 +407,12 @@ export function WalletPage() {
         pin,
       })
       toast.success(res.message)
-      setWithdrawForm({ amount: "", bankCode: "", accountNumber: "", accountName: "" })
+      setWithdrawForm({
+        amount: "",
+        bankCode: "",
+        accountNumber: "",
+        accountName: "",
+      })
       setPendingWithdrawData(null)
       load()
     } catch (err: any) {
@@ -381,34 +498,48 @@ export function WalletPage() {
                 </p>
               )}
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={!isActive || wallet.availableBalance <= 0}
-              onClick={() => setShowWithdraw(true)}
-            >
-              <IconArrowUp className="size-3.5" />
-              Withdraw
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                disabled={!isActive}
+                onClick={() => {
+                  setTopupMethod("bank")
+                  setShowTopup(true)
+                }}
+              >
+                <IconPlus className="size-3.5" />
+                Add Money
+              </Button>
+              <Button
+                size="sm"
+                className="hidden"
+                variant="outline"
+                disabled={!isActive || wallet.availableBalance <= 0}
+                onClick={() => setShowWithdraw(true)}
+              >
+                <IconArrowUp className="size-3.5" />
+                Withdraw
+              </Button>
+            </div>
           </div>
 
-          {/* Fund account info */}
-          {isActive && wallet.virtualAccountNo ? (
+          {/* Bank account — compact, always visible when active */}
+          {isActive && wallet.virtualAccountNo && (
             <div className="mt-4 rounded-lg border bg-muted/40 p-3">
-              <p className="mb-1 text-xs font-medium text-muted-foreground">
-                Fund your wallet — bank transfer to:
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                Fund by bank transfer:
               </p>
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <p className="text-lg font-bold tracking-wider">
                     {wallet.virtualAccountNo}
                   </p>
-                  <p className="text-xs text-muted-foreground">{bankName}</p>
-                  {wallet.virtualAccountName && (
-                    <p className="text-xs text-muted-foreground">
-                      Account name: {wallet.virtualAccountName}
-                    </p>
-                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {bankName}
+                    {wallet.virtualAccountName
+                      ? ` · ${wallet.virtualAccountName}`
+                      : ""}
+                  </p>
                 </div>
                 <Button size="icon" variant="ghost" onClick={copyAccountNumber}>
                   {copied ? (
@@ -418,16 +549,22 @@ export function WalletPage() {
                   )}
                 </Button>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Transfers reflect instantly. Use this account number from any
-                bank app.
-              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3 w-full"
+                onClick={startBalanceSync}
+                disabled={syncingBalance}
+              >
+                {syncingBalance ? (
+                  <IconLoader2 className="size-4 animate-spin" />
+                ) : (
+                  <IconRefresh className="size-4" />
+                )}
+                {syncingBalance ? "Checking…" : "I've made the transfer"}
+              </Button>
             </div>
-          ) : isActive ? (
-            <p className="mt-3 text-xs text-muted-foreground">
-              Your virtual account number is being set up. Check back shortly.
-            </p>
-          ) : null}
+          )}
         </CardContent>
       </Card>
 
@@ -501,6 +638,127 @@ export function WalletPage() {
         </CardContent>
       </Card>
 
+      {/* Top-up Dialog */}
+      <Dialog open={showTopup} onOpenChange={setShowTopup}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Add Money</DialogTitle>
+            <DialogDescription>
+              Fund your Sage Nest wallet via bank transfer or card.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Method tabs */}
+          <div className="flex gap-1.5 rounded-xl border bg-muted/30 p-1">
+            {[
+              {
+                key: "bank" as const,
+                label: "Bank Transfer",
+                icon: IconBuildingBank,
+              },
+              { key: "card" as const, label: "Card", icon: IconCreditCard },
+            ].map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setTopupMethod(key)}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium transition-colors",
+                  topupMethod === key
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className="size-3.5" />
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Bank Transfer */}
+          {topupMethod === "bank" && wallet?.virtualAccountNo && (
+            <div className="space-y-3">
+              <div className="space-y-2 rounded-xl border bg-muted/30 p-4 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Account number</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-base font-bold tracking-wider">
+                      {wallet.virtualAccountNo}
+                    </span>
+                    <button
+                      onClick={copyAccountNumber}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {copied ? (
+                        <IconCheck className="size-4 text-emerald-600" />
+                      ) : (
+                        <IconCopy className="size-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Bank</span>
+                  <span>{bankName}</span>
+                </div>
+                {wallet.virtualAccountName && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Account name</span>
+                    <span>{wallet.virtualAccountName}</span>
+                  </div>
+                )}
+              </div>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={startBalanceSync}
+                disabled={syncingBalance}
+              >
+                {syncingBalance ? (
+                  <IconLoader2 className="size-4 animate-spin" />
+                ) : (
+                  <IconRefresh className="size-4" />
+                )}
+                {syncingBalance ? "Checking…" : "I've made the transfer"}
+              </Button>
+              <p className="text-center text-xs text-muted-foreground">
+                Transfer from any Nigerian bank, then tap above to confirm.
+              </p>
+            </div>
+          )}
+
+          {/* Card */}
+          {topupMethod === "card" && (
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label>Amount (₦)</Label>
+                <CurrencyInput
+                  min={100}
+                  autoFocus
+                  placeholder="e.g. 10,000"
+                  value={topupAmount}
+                  onChange={setTopupAmount}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                You'll be redirected to Paystack to complete the payment
+                securely.
+              </p>
+              <Button
+                className="w-full"
+                onClick={handleCardTopup}
+                disabled={topupLoading || !topupAmount}
+              >
+                {topupLoading && (
+                  <IconLoader2 className="size-4 animate-spin" />
+                )}
+                {topupLoading ? "Redirecting…" : "Pay with Card"}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* KYC Dialog */}
       <Dialog open={showKyc} onOpenChange={setShowKyc}>
         <DialogContent className="max-w-sm">
@@ -570,7 +828,7 @@ export function WalletPage() {
         open={showSetPin}
         onSuccess={() => {
           setShowSetPin(false)
-          setWallet((w) => w ? { ...w, transactionPinSet: true } : w)
+          setWallet((w) => (w ? { ...w, transactionPinSet: true } : w))
         }}
       />
 
@@ -598,13 +856,10 @@ export function WalletPage() {
           <div className="space-y-3">
             <div className="space-y-1.5">
               <Label>Amount (₦)</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 50000"
+              <CurrencyInput
+                placeholder="e.g. 50,000"
                 value={withdrawForm.amount}
-                onChange={(e) =>
-                  setWithdrawForm((f) => ({ ...f, amount: e.target.value }))
-                }
+                onChange={(v) => setWithdrawForm((f) => ({ ...f, amount: v }))}
               />
             </div>
             <div className="space-y-1.5">

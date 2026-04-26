@@ -44,13 +44,16 @@ function NairaInput({
                 ₦
               </span>
               <Input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 placeholder="0"
                 min={0}
                 className="pl-7"
-                {...field}
-                value={(field.value as number) ?? ""}
-                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                value={(field.value as number) ? (field.value as number).toLocaleString("en-NG") : ""}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, "")
+                  field.onChange(raw ? parseInt(raw, 10) : 0)
+                }}
               />
             </div>
           </FormControl>

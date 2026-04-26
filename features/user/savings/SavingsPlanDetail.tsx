@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
@@ -18,6 +18,7 @@ import {
   IconSettings,
   IconWallet,
   IconCreditCard,
+  IconRefresh,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -35,6 +36,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { CurrencyInput } from "@/components/ui/currency-input"
 import { Label } from "@/components/ui/label"
 import type { SavingsPlan } from "./FirstKeyPage"
 
@@ -50,6 +52,7 @@ interface Transaction {
 }
 
 interface PlanDetail extends SavingsPlan {
+  anchorAccountId?: any
   transactions: Transaction[]
 }
 
@@ -97,11 +100,15 @@ function BankTransferSection({
   nubanCopied,
   onCopy,
   onProvisioned,
+  onSync,
+  syncing,
 }: {
   plan: PlanDetail
   nubanCopied: boolean
   onCopy: () => void
   onProvisioned: () => void
+  onSync: () => void
+  syncing: boolean
 }) {
   const [provisioning, setProvisioning] = useState(false)
 
@@ -186,9 +193,21 @@ function BankTransferSection({
           </div>
         )}
       </div>
-      <p className="text-xs text-muted-foreground">
-        Transfer any amount from any Nigerian bank. Your balance updates
-        instantly.
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={onSync}
+        disabled={syncing}
+      >
+        {syncing ? (
+          <IconLoader2 className="size-4 animate-spin" />
+        ) : (
+          <IconRefresh className="size-4" />
+        )}
+        {syncing ? "Checking…" : "I've made the transfer"}
+      </Button>
+      <p className="text-center text-xs text-muted-foreground">
+        Tap above after transferring — we'll confirm and update your balance.
       </p>
     </div>
   )
@@ -215,12 +234,49 @@ function TopUpDialog({
   const [amount, setAmount] = useState("")
   const [loading, setLoading] = useState(false)
   const [nubanCopied, setNubanCopied] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+  const dialogSyncAttempts = useRef(0)
+  const dialogSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const copyNuban = () => {
     if (!plan.nuban) return
     navigator.clipboard.writeText(plan.nuban)
     setNubanCopied(true)
     setTimeout(() => setNubanCopied(false), 2000)
+  }
+
+  function startSync() {
+    if (dialogSyncTimer.current) clearTimeout(dialogSyncTimer.current)
+    dialogSyncAttempts.current = 0
+    setSyncing(true)
+    runDialogSync()
+  }
+
+  async function runDialogSync() {
+    if (dialogSyncAttempts.current >= 12) {
+      setSyncing(false)
+      toast.info(
+        "Transfer not detected yet — it will reflect automatically once confirmed."
+      )
+      return
+    }
+    try {
+      const res = await postData<{ synced: boolean; credited?: number }>(
+        `/savings/${plan.id}/sync`,
+        {}
+      )
+      if (res.synced && res.credited) {
+        setSyncing(false)
+        toast.success(`₦${res.credited.toLocaleString()} transfer confirmed!`)
+        onSuccess()
+        onClose()
+        return
+      }
+    } catch {
+      // non-fatal
+    }
+    dialogSyncAttempts.current += 1
+    dialogSyncTimer.current = setTimeout(runDialogSync, 5000)
   }
 
   const handleWalletDeposit = async () => {
@@ -319,13 +375,12 @@ function TopUpDialog({
             )}
             <div className="space-y-1">
               <Label>Amount (₦)</Label>
-              <Input
-                type="number"
+              <CurrencyInput
                 min={100}
                 autoFocus
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="e.g. 10000"
+                onChange={setAmount}
+                placeholder="e.g. 10,000"
               />
             </div>
             <Button
@@ -347,13 +402,12 @@ function TopUpDialog({
             </p>
             <div className="space-y-1">
               <Label>Amount (₦)</Label>
-              <Input
-                type="number"
+              <CurrencyInput
                 min={100}
                 autoFocus
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="e.g. 10000"
+                onChange={setAmount}
+                placeholder="e.g. 10,000"
               />
             </div>
             <Button
@@ -374,6 +428,8 @@ function TopUpDialog({
             nubanCopied={nubanCopied}
             onCopy={copyNuban}
             onProvisioned={onSuccess}
+            onSync={startSync}
+            syncing={syncing}
           />
         )}
       </DialogContent>
@@ -521,6 +577,29 @@ export function SavingsPlanDetail({ id }: { id: string }) {
         setTxTotal(txData.total)
         setTxPage(1)
       }
+      // Silent balance sync on every page load — catches missed webhooks
+      if (
+        data.anchorAccountId &&
+        (data.status === "ACTIVE" || data.status === "PAUSED")
+      ) {
+        postData<{ synced: boolean; credited?: number }>(
+          `/savings/${id}/sync`,
+          {}
+        )
+          .then((res) => {
+            if (res.synced && res.credited) {
+              setPlan((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      totalDeposited: prev.totalDeposited + res.credited!,
+                    }
+                  : prev
+              )
+            }
+          })
+          .catch(() => {})
+      }
     } catch {
       toast.error("Failed to load plan")
     } finally {
@@ -556,6 +635,9 @@ export function SavingsPlanDetail({ id }: { id: string }) {
 
   useEffect(() => {
     load()
+    return () => {
+      if (planSyncTimer.current) clearTimeout(planSyncTimer.current)
+    }
   }, [load])
 
   // Auto-verify card deposit when Paystack redirects back with ?verify=<ref>
@@ -596,11 +678,49 @@ export function SavingsPlanDetail({ id }: { id: string }) {
     }
   }
 
+  const [syncing, setSyncing] = useState(false)
+  const planSyncAttempts = useRef(0)
+  const planSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const copyNuban = () => {
     if (!plan?.nuban) return
     navigator.clipboard.writeText(plan.nuban)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  function startPlanSync() {
+    if (!plan) return
+    if (planSyncTimer.current) clearTimeout(planSyncTimer.current)
+    planSyncAttempts.current = 0
+    setSyncing(true)
+    runPlanSync(plan.id)
+  }
+
+  async function runPlanSync(planId: string) {
+    if (planSyncAttempts.current >= 12) {
+      setSyncing(false)
+      toast.info(
+        "Transfer not detected yet — it will reflect automatically once confirmed."
+      )
+      return
+    }
+    try {
+      const res = await postData<{ synced: boolean; credited?: number }>(
+        `/savings/${planId}/sync`,
+        {}
+      )
+      if (res.synced && res.credited) {
+        setSyncing(false)
+        toast.success(`₦${res.credited.toLocaleString()} transfer confirmed!`)
+        load()
+        return
+      }
+    } catch {
+      // non-fatal
+    }
+    planSyncAttempts.current += 1
+    planSyncTimer.current = setTimeout(() => runPlanSync(planId), 5000)
   }
 
   if (loading) {
@@ -714,7 +834,7 @@ export function SavingsPlanDetail({ id }: { id: string }) {
           </Button>
           <Button
             variant="outline"
-            className="flex-1"
+            className="hidden flex-1"
             onClick={() => setWithdrawOpen(true)}
           >
             <IconArrowUp className="size-4" />
@@ -779,8 +899,23 @@ export function SavingsPlanDetail({ id }: { id: string }) {
                 </div>
               )}
               <p className="pt-1 text-xs text-muted-foreground">
-                Transfer to this account from any bank. Funds reflect instantly.
+                Transfer to this account from any bank. Tap below after
+                transferring.
               </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3 w-full"
+                onClick={startPlanSync}
+                disabled={syncing}
+              >
+                {syncing ? (
+                  <IconLoader2 className="size-4 animate-spin" />
+                ) : (
+                  <IconRefresh className="size-4" />
+                )}
+                {syncing ? "Checking…" : "I've made the transfer"}
+              </Button>
             </div>
           ) : (
             <div className="space-y-3">

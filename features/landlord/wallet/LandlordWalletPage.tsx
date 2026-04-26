@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { Suspense, useCallback, useEffect, useState } from "react"
 import { IconClock, IconLoader2, IconArrowDown } from "@tabler/icons-react"
 
 import { fetchData } from "@/lib/api"
@@ -142,7 +142,9 @@ function PendingEscrowsCard() {
 export function LandlordWalletPage() {
   return (
     <div className="space-y-4">
-      <WalletPage />
+      <Suspense>
+        <WalletPage />
+      </Suspense>
       <PendingEscrowsCard />
     </div>
   )

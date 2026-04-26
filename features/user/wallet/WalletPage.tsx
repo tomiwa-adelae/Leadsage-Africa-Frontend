@@ -552,7 +552,7 @@ export function WalletPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="mt-3 w-full"
+                className="mt-3 w-full hidden"
                 onClick={startBalanceSync}
                 disabled={syncingBalance}
               >

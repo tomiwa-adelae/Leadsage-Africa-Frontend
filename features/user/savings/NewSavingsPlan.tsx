@@ -711,6 +711,7 @@ function CommitmentModal({
   const [wallet, setWallet] = useState<WalletInfo | null>(null)
   const [fetchingWallet, setFetchingWallet] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [reopening, setReopening] = useState(false)
   const [cardState, setCardState] = useState<{
     planId: string
     reference: string
@@ -761,7 +762,7 @@ function CommitmentModal({
     }
   }
 
-  // Card tab: create plan → init Paystack → open in new tab
+  // Card tab: create plan → init Paystack → redirect
   const initiateCardPayment = async () => {
     setLoading(true)
     try {
@@ -771,11 +772,29 @@ function CommitmentModal({
         reference: string
       }>(`/savings/${plan.id}/deposit/card`, { amount })
       setCardState({ planId: plan.id, reference })
-      window.open(paymentUrl, "_blank")
+      window.location.href = paymentUrl
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "Failed to initialise payment")
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Reopen Paystack for an already-created plan — never creates a new plan
+  const reopenCardPayment = async () => {
+    if (!cardState) return
+    setReopening(true)
+    try {
+      const { paymentUrl, reference } = await postData<{
+        paymentUrl: string
+        reference: string
+      }>(`/savings/${cardState.planId}/deposit/card`, { amount })
+      setCardState({ planId: cardState.planId, reference })
+      window.location.href = paymentUrl
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Failed to reopen payment page")
+    } finally {
+      setReopening(false)
     }
   }
 
@@ -974,10 +993,11 @@ function CommitmentModal({
                 </Button>
                 <button
                   type="button"
-                  onClick={initiateCardPayment}
-                  className="w-full text-center text-xs text-muted-foreground underline-offset-2 hover:underline"
+                  onClick={reopenCardPayment}
+                  disabled={reopening}
+                  className="w-full text-center text-xs text-muted-foreground underline-offset-2 hover:underline disabled:opacity-50"
                 >
-                  Reopen payment page
+                  {reopening ? "Opening…" : "Reopen payment page"}
                 </button>
               </>
             )}

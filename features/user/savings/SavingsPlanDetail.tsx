@@ -834,7 +834,7 @@ export function SavingsPlanDetail({ id }: { id: string }) {
           </Button>
           <Button
             variant="outline"
-            className="hidden flex-1"
+            className="flex-1"
             onClick={() => setWithdrawOpen(true)}
           >
             <IconArrowUp className="size-4" />

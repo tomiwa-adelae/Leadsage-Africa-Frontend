@@ -118,10 +118,22 @@ const BAN_REASONS = [
   "Other (see details below)",
 ]
 
-const STATUS_BADGE: Record<AccountStatus, { label: string; className: string }> = {
-  ACTIVE:    { label: "Active",    className: "bg-green-100 text-green-700 border-green-200" },
-  SUSPENDED: { label: "Suspended", className: "bg-yellow-100 text-yellow-700 border-yellow-200" },
-  BANNED:    { label: "Banned",    className: "bg-red-100 text-red-700 border-red-200" },
+const STATUS_BADGE: Record<
+  AccountStatus,
+  { label: string; className: string }
+> = {
+  ACTIVE: {
+    label: "Active",
+    className: "bg-green-100 text-green-700 border-green-200",
+  },
+  SUSPENDED: {
+    label: "Suspended",
+    className: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  },
+  BANNED: {
+    label: "Banned",
+    className: "bg-red-100 text-red-700 border-red-200",
+  },
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -176,8 +188,9 @@ export function AdminUsers() {
       action.newStatus === "ACTIVE"
         ? undefined
         : presetReason === reasons[reasons.length - 1] || !presetReason
-        ? customReason.trim()
-        : presetReason + (customReason.trim() ? `\n\n${customReason.trim()}` : "")
+          ? customReason.trim()
+          : presetReason +
+            (customReason.trim() ? `\n\n${customReason.trim()}` : "")
 
     if (action.newStatus !== "ACTIVE" && !finalReason) {
       toast.error("Please provide a reason.")
@@ -218,32 +231,51 @@ export function AdminUsers() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-52">
-          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <div className="relative min-w-52 flex-1">
+          <IconSearch className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search name, email, username…"
             className="pl-9"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
           />
         </div>
-        <Select value={roleFilter} onValueChange={(v) => { setRoleFilter(v); setPage(1) }}>
+        <Select
+          value={roleFilter}
+          onValueChange={(v) => {
+            setRoleFilter(v)
+            setPage(1)
+          }}
+        >
           <SelectTrigger className="w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {ROLE_OPTIONS.map((o) => (
-              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1) }}>
+        <Select
+          value={statusFilter}
+          onValueChange={(v) => {
+            setStatusFilter(v)
+            setPage(1)
+          }}
+        >
           <SelectTrigger className="w-40">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {STATUS_OPTIONS.map((o) => (
-              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -271,33 +303,44 @@ export function AdminUsers() {
               </TableRow>
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-40 text-center text-destructive text-sm">
+                <TableCell
+                  colSpan={6}
+                  className="h-40 text-center text-sm text-destructive"
+                >
                   {error}
                 </TableCell>
               </TableRow>
             ) : !data?.users.length ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-40 text-center text-muted-foreground text-sm">
+                <TableCell
+                  colSpan={6}
+                  className="h-40 text-center text-sm text-muted-foreground"
+                >
                   No users found
                 </TableCell>
               </TableRow>
             ) : (
               data.users.map((u) => {
                 const badge = STATUS_BADGE[u.accountStatus]
-                const initials = `${u.firstName?.[0] ?? ""}${u.lastName?.[0] ?? ""}`.toUpperCase()
+                const initials =
+                  `${u.firstName?.[0] ?? ""}${u.lastName?.[0] ?? ""}`.toUpperCase()
                 return (
                   <TableRow key={u.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="size-8">
                           <AvatarImage src={u.image ?? ""} />
-                          <AvatarFallback className="text-xs bg-muted">{initials}</AvatarFallback>
+                          <AvatarFallback className="bg-muted text-xs">
+                            {initials}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="text-sm font-medium">
                             {u.firstName} {u.lastName}
                           </p>
-                          <p className="text-xs text-muted-foreground">{u.email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {u.email}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
@@ -308,7 +351,10 @@ export function AdminUsers() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
-                        <Badge variant="outline" className={`text-xs ${badge.className}`}>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${badge.className}`}
+                        >
                           {badge.label}
                         </Badge>
                         {u.accountStatusReason && (
@@ -323,7 +369,9 @@ export function AdminUsers() {
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {new Date(u.createdAt).toLocaleDateString("en-NG", {
-                        day: "numeric", month: "short", year: "numeric",
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
                       })}
                     </TableCell>
                     <TableCell>
@@ -333,7 +381,7 @@ export function AdminUsers() {
                             <IconDots className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="min-w-40">
                           {u.accountStatus !== "ACTIVE" && (
                             <DropdownMenuItem
                               className="text-green-600 focus:text-green-600"
@@ -378,12 +426,24 @@ export function AdminUsers() {
       {/* Pagination */}
       {data && data.pages > 1 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>Page {data.page} of {data.pages} ({data.total} total)</span>
+          <span>
+            Page {data.page} of {data.pages} ({data.total} total)
+          </span>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={page <= 1}
+            >
               Previous
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= data.pages}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page >= data.pages}
+            >
               Next
             </Button>
           </div>
@@ -423,7 +483,9 @@ export function AdminUsers() {
                   <p className="text-sm font-medium">
                     {action.user.firstName} {action.user.lastName}
                   </p>
-                  <p className="text-xs text-muted-foreground">{action.user.email}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {action.user.email}
+                  </p>
                 </div>
               </div>
 
@@ -431,11 +493,18 @@ export function AdminUsers() {
                 <>
                   <div className="space-y-1.5">
                     <Label>Reason</Label>
-                    <Select value={presetReason} onValueChange={setPresetReason}>
-                      <SelectTrigger><SelectValue placeholder="Select a reason…" /></SelectTrigger>
+                    <Select
+                      value={presetReason}
+                      onValueChange={setPresetReason}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a reason…" />
+                      </SelectTrigger>
                       <SelectContent>
                         {reasonOptions.map((r) => (
-                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -443,7 +512,9 @@ export function AdminUsers() {
                   <div className="space-y-1.5">
                     <Label>
                       Additional details{" "}
-                      <span className="text-muted-foreground font-normal">(optional)</span>
+                      <span className="font-normal text-muted-foreground">
+                        (optional)
+                      </span>
                     </Label>
                     <Textarea
                       placeholder="Any additional context for this action…"
@@ -458,14 +529,31 @@ export function AdminUsers() {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAction(null)} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={() => setAction(null)}
+              disabled={submitting}
+            >
               Cancel
             </Button>
             <Button
-              variant={action?.newStatus === "ACTIVE" ? "default" : action?.newStatus === "BANNED" ? "destructive" : "outline"}
-              className={action?.newStatus === "SUSPENDED" ? "border-yellow-300 bg-yellow-50 text-yellow-800 hover:bg-yellow-100" : ""}
+              variant={
+                action?.newStatus === "ACTIVE"
+                  ? "default"
+                  : action?.newStatus === "BANNED"
+                    ? "destructive"
+                    : "outline"
+              }
+              className={
+                action?.newStatus === "SUSPENDED"
+                  ? "border-yellow-300 bg-yellow-50 text-yellow-800 hover:bg-yellow-100"
+                  : ""
+              }
               onClick={handleStatusUpdate}
-              disabled={submitting || (needsReason && !presetReason && !customReason.trim())}
+              disabled={
+                submitting ||
+                (needsReason && !presetReason && !customReason.trim())
+              }
             >
               {submitting ? (
                 <IconLoader2 className="size-4 animate-spin" />
@@ -480,8 +568,8 @@ export function AdminUsers() {
               {action?.newStatus === "ACTIVE"
                 ? "reactivation"
                 : action?.newStatus === "BANNED"
-                ? "ban"
-                : "suspension"}
+                  ? "ban"
+                  : "suspension"}
             </Button>
           </DialogFooter>
         </DialogContent>

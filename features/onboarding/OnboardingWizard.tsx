@@ -40,6 +40,7 @@ import {
 
 interface FormData {
   // Step 1 — Personal info
+  middleName: string
   gender: string
   dob: string
   imageUrl: string
@@ -65,6 +66,7 @@ interface FormData {
 }
 
 const INITIAL: FormData = {
+  middleName: "",
   gender: "",
   dob: "",
   imageUrl: "",
@@ -291,6 +293,24 @@ function PersonalInfoStep({
           className="hidden"
           onChange={handleFile}
         />
+      </div>
+
+      {/* Middle / other name */}
+      <div className="space-y-2">
+        <Label htmlFor="middleName">
+          Middle name / other name{" "}
+          <span className="text-muted-foreground">(optional)</span>
+        </Label>
+        <Input
+          id="middleName"
+          value={data.middleName}
+          onChange={(e) => onChange({ middleName: e.target.value })}
+          placeholder="e.g. Chukwuemeka, Oluwaseun"
+        />
+        <p className="text-xs text-muted-foreground">
+          Enter exactly as it appears on your BVN — this helps us verify your
+          identity.
+        </p>
       </div>
 
       {/* Gender */}
@@ -780,6 +800,7 @@ export function OnboardingWizard() {
     setSubmitting(true)
     try {
       const payload = {
+        middleName: data.middleName || undefined,
         gender: data.gender || undefined,
         dob: data.dob || undefined,
         country: data.country || undefined,
@@ -960,7 +981,7 @@ export function OnboardingWizard() {
               </div>
 
               {/* Skip options */}
-              {step === 0 ? (
+              {/* {step === 0 ? (
                 <button
                   type="button"
                   onClick={skipAll}
@@ -980,7 +1001,7 @@ export function OnboardingWizard() {
                     ? "Skip and complete setup"
                     : "Skip this step →"}
                 </button>
-              )}
+              )} */}
             </div>
           </div>
         )}

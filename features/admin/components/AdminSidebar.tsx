@@ -18,6 +18,7 @@ import {
   IconPigMoney,
   IconArticle,
   IconBook,
+  IconArrowUpFromArc,
 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -77,6 +78,11 @@ const mainLinks = [
     label: "FirstKey Savings",
     href: "/admin/savings",
     icon: IconPigMoney,
+  },
+  {
+    label: "Withdrawal Requests",
+    href: "/admin/withdrawals",
+    icon: IconArrowUpFromArc,
   },
   {
     label: "Financial Ledger",

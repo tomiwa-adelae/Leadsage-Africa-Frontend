@@ -286,7 +286,7 @@ export function AdminTeam() {
                           <IconDots className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="min-w-40">
                         <DropdownMenuItem
                           onClick={() => {
                             setEditTarget(m)

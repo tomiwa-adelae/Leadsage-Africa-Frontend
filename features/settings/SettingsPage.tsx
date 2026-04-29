@@ -43,6 +43,7 @@ import {
 const profileSchema = z.object({
   firstName: z.string().min(2, "At least 2 characters"),
   lastName: z.string().min(2, "At least 2 characters"),
+  middleName: z.string().optional(),
   phoneNumber: z.string().min(7, "Enter a valid phone number"),
   dob: z.string().optional(),
   gender: z.string().optional(),
@@ -78,6 +79,7 @@ function ProfileForm() {
     defaultValues: {
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
+      middleName: user?.middleName ?? "",
       phoneNumber: user?.phoneNumber ?? "",
       dob: (user as any)?.dob ?? "",
       gender: user?.gender ?? "",
@@ -143,6 +145,27 @@ function ProfileForm() {
             )}
           />
         </div>
+
+        {/* Middle / other name */}
+        <FormField
+          control={form.control}
+          name="middleName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Middle name / other name{" "}
+                <span className="text-muted-foreground font-normal">(optional)</span>
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. Chukwuemeka, Oluwaseun" {...field} />
+              </FormControl>
+              <p className="text-xs text-muted-foreground">
+                Enter exactly as it appears on your BVN — required for wallet identity verification.
+              </p>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Phone + DOB */}
         <div className="grid gap-4 sm:grid-cols-2">

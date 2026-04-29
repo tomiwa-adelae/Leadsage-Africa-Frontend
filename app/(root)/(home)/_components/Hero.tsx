@@ -58,7 +58,7 @@ export function Hero() {
         </div>
 
         {/* ── Right col ── */}
-        <div className="relative hidden justify-end lg:col-span-2 lg:flex">
+        <div className="relative hidden justify-end lg:col-span-2">
           {/* Floating property cards */}
           <div className="absolute top-8 -left-6 z-10 flex max-w-[200px] items-center gap-3 rounded-xl bg-white/95 px-3 py-2.5 text-foreground shadow-xl backdrop-blur">
             <div className="relative size-10 shrink-0 overflow-hidden rounded-lg">

@@ -43,6 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import Link from "next/link"
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -56,6 +57,25 @@ interface WalletAccount {
   availableBalance: number
   pendingBalance: number
   transactionPinSet: boolean
+  withdrawalAccountNumber: string | null
+  withdrawalBankName: string | null
+  withdrawalAccountName: string | null
+  withdrawalAccountChangedAt: string | null
+  cooldownDaysLeft?: number
+}
+
+interface WithdrawalRequest {
+  id: string
+  amount: number
+  fee: number
+  netAmount: number
+  bankAccountNumber: string
+  bankName: string
+  accountName: string
+  status: "PENDING" | "COMPLETED" | "REJECTED" | "CANCELLED"
+  adminNote: string | null
+  processedAt: string | null
+  createdAt: string
 }
 
 interface WalletTx {
@@ -147,16 +167,27 @@ export function WalletPage() {
   })
   const [submittingKyc, setSubmittingKyc] = useState(false)
 
-  // Withdraw dialog
-  const [showWithdraw, setShowWithdraw] = useState(false)
-  const [withdrawForm, setWithdrawForm] = useState({
-    amount: "",
-    bankCode: "",
+  // Withdrawal requests
+  const [withdrawRequests, setWithdrawRequests] = useState<WithdrawalRequest[]>(
+    []
+  )
+
+  // Bank account setup dialog
+  const [showBankAccount, setShowBankAccount] = useState(false)
+  const [bankForm, setBankForm] = useState({
     accountNumber: "",
-    accountName: "",
+    bankCode: "",
+    bankName: "",
   })
+  const [verifiedBankName, setVerifiedBankName] = useState("")
   const [verifyingBank, setVerifyingBank] = useState(false)
-  const [withdrawing, setWithdrawing] = useState(false)
+  const [savingBank, setSavingBank] = useState(false)
+
+  // Withdrawal request dialog
+  const [showWithdraw, setShowWithdraw] = useState(false)
+  const [withdrawAmount, setWithdrawAmount] = useState("")
+  const [requestingWithdrawal, setRequestingWithdrawal] = useState(false)
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
 
   // KYC auto-sync
   const [syncing, setSyncing] = useState(false)
@@ -170,22 +201,23 @@ export function WalletPage() {
   // PIN modals
   const [showSetPin, setShowSetPin] = useState(false)
   const [showPinModal, setShowPinModal] = useState(false)
-  const [pendingWithdrawData, setPendingWithdrawData] = useState<{
-    amount: number
-    bankAccountNumber: string
-    bankCode: string
-    bankAccountName: string
-  } | null>(null)
+  const [pinModalMode, setPinModalMode] = useState<"withdraw" | "saveBank">(
+    "withdraw"
+  )
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [w, t] = await Promise.all([
+      const [w, txRes, wr] = await Promise.all([
         fetchData<WalletAccount>("/wallet"),
-        fetchData<WalletTx[]>("/wallet/transactions"),
+        fetchData<{ transactions: WalletTx[] }>("/wallet/transactions?limit=5"),
+        fetchData<WithdrawalRequest[]>("/wallet/withdraw/requests").catch(
+          () => [] as WithdrawalRequest[]
+        ),
       ])
       setWallet(w)
-      setTxs(t)
+      setTxs(txRes.transactions)
+      setWithdrawRequests(wr)
       if (!w.transactionPinSet) setShowSetPin(true)
       if (w.kycStatus === "SUBMITTED" || w.kycStatus === "FAILED") {
         syncAttempts.current = 0
@@ -204,8 +236,10 @@ export function WalletPage() {
                     }
                   : prev
               )
-              fetchData<WalletTx[]>("/wallet/transactions")
-                .then(setTxs)
+              fetchData<{ transactions: WalletTx[] }>(
+                "/wallet/transactions?limit=5"
+              )
+                .then((r) => setTxs(r.transactions))
                 .catch(() => {})
             }
           })
@@ -273,8 +307,8 @@ export function WalletPage() {
 
   async function handleCardTopup() {
     const n = parseFloat(topupAmount)
-    if (!n || n < 100) {
-      toast.error("Minimum top-up is ₦100")
+    if (!n || n < 1000) {
+      toast.error("Minimum top-up is ₦1000")
       return
     }
     setTopupLoading(true)
@@ -355,70 +389,102 @@ export function WalletPage() {
     }
   }
 
+  // ── Bank account setup ─────────────────────────────────────────────────────
+
   async function handleVerifyBank() {
-    if (!withdrawForm.accountNumber || !withdrawForm.bankCode) return
+    if (!bankForm.accountNumber || !bankForm.bankCode) return
     setVerifyingBank(true)
+    setVerifiedBankName("")
     try {
       const { accountName } = await postData<{ accountName: string }>(
         "/wallet/verify-bank",
-        {
-          accountNumber: withdrawForm.accountNumber,
-          bankCode: withdrawForm.bankCode,
-        }
+        { accountNumber: bankForm.accountNumber, bankCode: bankForm.bankCode }
       )
-      setWithdrawForm((f) => ({ ...f, accountName }))
+      setVerifiedBankName(accountName)
       toast.success(`Account verified: ${accountName}`)
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "Could not verify account")
-      setWithdrawForm((f) => ({ ...f, accountName: "" }))
     } finally {
       setVerifyingBank(false)
     }
   }
 
-  function handleWithdraw() {
-    const amount = parseFloat(withdrawForm.amount)
-    if (
-      !amount ||
-      !withdrawForm.bankCode ||
-      !withdrawForm.accountNumber ||
-      !withdrawForm.accountName
-    ) {
-      toast.error("Please complete all fields and verify your account")
+  function openSaveBankPin() {
+    if (!verifiedBankName || !bankForm.bankCode || !bankForm.accountNumber) {
+      toast.error("Please verify your account number first")
       return
     }
-    setPendingWithdrawData({
-      amount,
-      bankAccountNumber: withdrawForm.accountNumber,
-      bankCode: withdrawForm.bankCode,
-      bankAccountName: withdrawForm.accountName,
-    })
+    setPinModalMode("saveBank")
+    setShowBankAccount(false)
+    setShowPinModal(true)
+  }
+
+  async function executeSaveBank(pin: string) {
+    setShowPinModal(false)
+    setSavingBank(true)
+    try {
+      await postData("/wallet/bank-account", {
+        accountNumber: bankForm.accountNumber,
+        bankCode: bankForm.bankCode,
+        bankName: bankForm.bankName,
+        pin,
+      })
+      toast.success("Withdrawal account saved")
+      setBankForm({ accountNumber: "", bankCode: "", bankName: "" })
+      setVerifiedBankName("")
+      load()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Could not save account")
+    } finally {
+      setSavingBank(false)
+    }
+  }
+
+  // ── Withdrawal request ─────────────────────────────────────────────────────
+
+  function handleWithdraw() {
+    const amount = parseFloat(withdrawAmount)
+    if (!amount || amount < 1000) {
+      toast.error("Minimum withdrawal is ₦1,000")
+      return
+    }
+    if (!wallet?.withdrawalAccountNumber) {
+      toast.error("Please set a withdrawal account first")
+      return
+    }
+    setPinModalMode("withdraw")
     setShowWithdraw(false)
     setShowPinModal(true)
   }
 
   async function executeWithdraw(pin: string) {
-    if (!pendingWithdrawData) return
     setShowPinModal(false)
-    setWithdrawing(true)
+    setRequestingWithdrawal(true)
     try {
-      const res = await postData<{ message: string }>("/wallet/withdraw", {
-        ...pendingWithdrawData,
-        pin,
-      })
+      const res = await postData<{ message: string; id: string }>(
+        "/wallet/withdraw/request",
+        { amount: parseFloat(withdrawAmount), pin }
+      )
       toast.success(res.message)
-      setWithdrawForm({
-        amount: "",
-        bankCode: "",
-        accountNumber: "",
-        accountName: "",
-      })
-      setPendingWithdrawData(null)
+      setWithdrawAmount("")
       load()
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? "Withdrawal failed")
+      toast.error(err?.response?.data?.message ?? "Withdrawal request failed")
     } finally {
-      setWithdrawing(false)
+      setRequestingWithdrawal(false)
+    }
+  }
+
+  async function handleCancel(id: string) {
+    setCancellingId(id)
+    try {
+      await postData(`/wallet/withdraw/${id}/cancel`, {})
+      toast.success("Withdrawal request cancelled")
+      load()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message ?? "Could not cancel request")
+    } finally {
+      setCancellingId(null)
     }
   }
 
@@ -512,7 +578,7 @@ export function WalletPage() {
               </Button>
               <Button
                 size="sm"
-                className="hidden"
+                // className="hidden"
                 variant="outline"
                 disabled={!isActive || wallet.availableBalance <= 0}
                 onClick={() => setShowWithdraw(true)}
@@ -552,7 +618,7 @@ export function WalletPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="mt-3 w-full hidden"
+                className="mt-3 hidden w-full"
                 onClick={startBalanceSync}
                 disabled={syncingBalance}
               >
@@ -568,12 +634,84 @@ export function WalletPage() {
         </CardContent>
       </Card>
 
+      {/* Pending withdrawal banner — shown prominently when a request is in flight */}
+      {withdrawRequests.some((r) => r.status === "PENDING") && (
+        <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900 dark:bg-blue-950/30">
+          <IconLoader2 className="mt-0.5 size-5 shrink-0 animate-spin text-blue-600" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
+              Withdrawal request pending
+            </p>
+            {withdrawRequests
+              .filter((r) => r.status === "PENDING")
+              .map((r) => (
+                <p
+                  key={r.id}
+                  className="text-xs text-blue-700 dark:text-blue-400"
+                >
+                  {fmt(r.amount)} → {r.accountName} ({r.bankName}) · being
+                  processed within 24 hours
+                </p>
+              ))}
+          </div>
+          <button
+            className="text-xs whitespace-nowrap text-blue-600 underline hover:text-blue-800"
+            onClick={() =>
+              handleCancel(
+                withdrawRequests.find((r) => r.status === "PENDING")!.id
+              )
+            }
+            disabled={!!cancellingId}
+          >
+            {cancellingId ? (
+              <IconLoader2 className="inline size-3 animate-spin" />
+            ) : (
+              "Cancel"
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Rejected withdrawal notice */}
+      {withdrawRequests.some((r) => r.status === "REJECTED") &&
+        !withdrawRequests.some((r) => r.status === "PENDING") && (
+          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-900 dark:bg-red-950/30">
+            <IconAlertCircle className="mt-0.5 size-5 shrink-0 text-red-600" />
+            <div>
+              <p className="text-sm font-semibold text-red-800 dark:text-red-300">
+                Withdrawal request declined
+              </p>
+              {withdrawRequests
+                .filter((r) => r.status === "REJECTED")
+                .slice(0, 1)
+                .map((r) => (
+                  <p
+                    key={r.id}
+                    className="text-xs text-red-700 dark:text-red-400"
+                  >
+                    {fmt(r.amount)} — {r.adminNote ?? "No reason provided"}
+                  </p>
+                ))}
+            </div>
+          </div>
+        )}
+
       {/* Transactions */}
       <Card>
         <CardHeader className="border-b pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm">
-            <IconWallet className="size-4" />
-            Transaction History
+          <CardTitle className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-2">
+              <IconWallet className="size-4" />
+              Recent Transactions
+            </span>
+            {txs.length > 0 && (
+              <Link
+                href="/wallet/history"
+                className="text-xs font-normal text-primary hover:underline"
+              >
+                View all
+              </Link>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -733,7 +871,7 @@ export function WalletPage() {
               <div className="space-y-1">
                 <Label>Amount (₦)</Label>
                 <CurrencyInput
-                  min={100}
+                  min={1000}
                   autoFocus
                   placeholder="e.g. 10,000"
                   value={topupAmount}
@@ -823,6 +961,131 @@ export function WalletPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Withdrawal account card */}
+      {isActive && (
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <IconBuildingBank className="size-4" />
+                Withdrawal Account
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs"
+                onClick={() => setShowBankAccount(true)}
+                disabled={
+                  !!(
+                    wallet.cooldownDaysLeft &&
+                    wallet.cooldownDaysLeft > 0 &&
+                    wallet.withdrawalAccountNumber
+                  )
+                }
+              >
+                {wallet.withdrawalAccountNumber ? "Change" : "Set up"}
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {wallet.withdrawalAccountNumber ? (
+              <div className="space-y-1">
+                <p className="text-sm font-semibold">
+                  {wallet.withdrawalAccountName}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {wallet.withdrawalAccountNumber} · {wallet.withdrawalBankName}
+                </p>
+                {wallet.cooldownDaysLeft && wallet.cooldownDaysLeft > 0 ? (
+                  <p className="text-xs text-amber-600">
+                    Can change again in {wallet.cooldownDaysLeft} day(s)
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No withdrawal account set. Add one to enable withdrawals.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Withdrawal requests history */}
+      {isActive && withdrawRequests.length > 0 && (
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <IconArrowUp className="size-4" />
+              Withdrawal Requests
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {withdrawRequests.map((req) => {
+                const statusColors: Record<string, string> = {
+                  PENDING: "text-amber-600 bg-amber-50 border-amber-200",
+                  COMPLETED:
+                    "text-emerald-600 bg-emerald-50 border-emerald-200",
+                  REJECTED: "text-red-600 bg-red-50 border-red-200",
+                  CANCELLED: "text-muted-foreground bg-muted/30 border-border",
+                }
+                return (
+                  <div
+                    key={req.id}
+                    className="space-y-1 rounded-lg border bg-muted/20 px-3 py-2.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {fmt(req.amount)} withdrawal
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          You receive {fmt(req.netAmount)} · {req.accountName}
+                        </p>
+                      </div>
+                      <span
+                        className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statusColors[req.status]}`}
+                      >
+                        {req.status.charAt(0) +
+                          req.status.slice(1).toLowerCase()}
+                      </span>
+                    </div>
+                    {req.adminNote && (
+                      <p className="text-xs text-red-600">
+                        Reason: {req.adminNote}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(req.createdAt).toLocaleDateString("en-NG", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                    {req.status === "PENDING" && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-0 text-xs text-red-600 hover:text-red-700"
+                        onClick={() => handleCancel(req.id)}
+                        disabled={cancellingId === req.id}
+                      >
+                        {cancellingId === req.id ? (
+                          <IconLoader2 className="size-3 animate-spin" />
+                        ) : (
+                          "Cancel request"
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Set PIN — blocking on first load */}
       <SetPinModal
         open={showSetPin}
@@ -832,46 +1095,47 @@ export function WalletPage() {
         }}
       />
 
-      {/* PIN confirmation before withdrawal */}
+      {/* Unified PIN modal */}
       <PinModal
         open={showPinModal}
-        description="Enter your PIN to confirm this withdrawal."
-        onConfirm={executeWithdraw}
-        onCancel={() => {
-          setShowPinModal(false)
-          setPendingWithdrawData(null)
-        }}
+        description={
+          pinModalMode === "withdraw"
+            ? "Enter your PIN to submit this withdrawal request."
+            : "Enter your PIN to save this withdrawal account."
+        }
+        onConfirm={
+          pinModalMode === "withdraw" ? executeWithdraw : executeSaveBank
+        }
+        onCancel={() => setShowPinModal(false)}
       />
 
-      {/* Withdraw Dialog */}
-      <Dialog open={showWithdraw} onOpenChange={setShowWithdraw}>
+      {/* Bank account setup dialog */}
+      <Dialog open={showBankAccount} onOpenChange={setShowBankAccount}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Withdraw funds</DialogTitle>
+            <DialogTitle>
+              {wallet.withdrawalAccountNumber
+                ? "Change withdrawal account"
+                : "Set withdrawal account"}
+            </DialogTitle>
             <DialogDescription>
-              Transfer to any Nigerian bank account. Available:{" "}
-              {fmt(wallet.availableBalance)}
+              You can only withdraw to your own verified bank account. The
+              account name must match your registered name.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label>Amount (₦)</Label>
-              <CurrencyInput
-                placeholder="e.g. 50,000"
-                value={withdrawForm.amount}
-                onChange={(v) => setWithdrawForm((f) => ({ ...f, amount: v }))}
-              />
-            </div>
-            <div className="space-y-1.5">
               <Label>Bank</Label>
               <Select
-                value={withdrawForm.bankCode}
+                value={bankForm.bankCode}
                 onValueChange={(v) => {
-                  setWithdrawForm((f) => ({
+                  const bank = BANKS.find((b) => b.code === v)
+                  setBankForm((f) => ({
                     ...f,
                     bankCode: v,
-                    accountName: "",
+                    bankName: bank?.name ?? "",
                   }))
+                  setVerifiedBankName("")
                 }}
               >
                 <SelectTrigger>
@@ -892,23 +1156,22 @@ export function WalletPage() {
                 <Input
                   placeholder="10-digit account number"
                   maxLength={10}
-                  value={withdrawForm.accountNumber}
-                  onChange={(e) =>
-                    setWithdrawForm((f) => ({
+                  value={bankForm.accountNumber}
+                  onChange={(e) => {
+                    setBankForm((f) => ({
                       ...f,
                       accountNumber: e.target.value,
-                      accountName: "",
                     }))
-                  }
+                    setVerifiedBankName("")
+                  }}
                 />
                 <Button
-                  // size="sm"
                   variant="outline"
                   onClick={handleVerifyBank}
                   disabled={
                     verifyingBank ||
-                    withdrawForm.accountNumber.length < 10 ||
-                    !withdrawForm.bankCode
+                    bankForm.accountNumber.length < 10 ||
+                    !bankForm.bankCode
                   }
                 >
                   {verifyingBank ? (
@@ -919,32 +1182,131 @@ export function WalletPage() {
                 </Button>
               </div>
             </div>
-            {withdrawForm.accountName && (
+            {verifiedBankName && (
               <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm dark:border-emerald-900 dark:bg-emerald-950/30">
                 <IconCheck className="size-4 text-emerald-600" />
                 <span className="font-medium text-emerald-800 dark:text-emerald-300">
-                  {withdrawForm.accountName}
+                  {verifiedBankName}
                 </span>
               </div>
             )}
+            <p className="text-xs text-muted-foreground">
+              This account will be saved for 30 days before you can change it
+              again.
+            </p>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowWithdraw(false)}
-              disabled={withdrawing}
+              onClick={() => setShowBankAccount(false)}
+              disabled={savingBank}
             >
               Cancel
             </Button>
             <Button
-              onClick={handleWithdraw}
-              disabled={
-                withdrawing || !withdrawForm.accountName || !withdrawForm.amount
-              }
+              onClick={openSaveBankPin}
+              disabled={savingBank || !verifiedBankName}
             >
-              {withdrawing && <IconLoader2 className="size-4 animate-spin" />}
-              Withdraw
+              {savingBank && <IconLoader2 className="size-4 animate-spin" />}
+              Save account
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Withdraw request dialog */}
+      <Dialog open={showWithdraw} onOpenChange={setShowWithdraw}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Request withdrawal</DialogTitle>
+            <DialogDescription>
+              Withdrawals are processed within 24 hours. Available:{" "}
+              {fmt(wallet.availableBalance)}
+            </DialogDescription>
+          </DialogHeader>
+          {wallet.withdrawalAccountNumber ? (
+            <div className="space-y-4">
+              {/* Saved account display */}
+              <div className="rounded-lg border bg-muted/30 px-3 py-2.5 text-sm">
+                <p className="mb-0.5 text-xs text-muted-foreground">
+                  Sending to
+                </p>
+                <p className="font-medium">{wallet.withdrawalAccountName}</p>
+                <p className="text-xs text-muted-foreground">
+                  {wallet.withdrawalAccountNumber} · {wallet.withdrawalBankName}
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Amount (₦)</Label>
+                <CurrencyInput
+                  placeholder="Min. ₦1,000"
+                  value={withdrawAmount}
+                  onChange={setWithdrawAmount}
+                  autoFocus
+                />
+              </div>
+              {/* Fee breakdown */}
+              {parseFloat(withdrawAmount) >= 1000 && (
+                <div className="space-y-1 rounded-lg border bg-muted/20 px-3 py-2.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Amount requested
+                    </span>
+                    <span>{fmt(parseFloat(withdrawAmount))}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      NIP transfer fee
+                    </span>
+                    <span className="text-red-500">− {fmt(50)}</span>
+                  </div>
+                  <div className="mt-1 flex justify-between border-t pt-1 font-semibold">
+                    <span>You receive</span>
+                    <span className="text-emerald-600">
+                      {fmt(parseFloat(withdrawAmount) - 50)}
+                    </span>
+                  </div>
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">
+                You will receive a notification once your withdrawal is
+                processed.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3 py-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                You need to set a withdrawal account first.
+              </p>
+              <Button
+                onClick={() => {
+                  setShowWithdraw(false)
+                  setShowBankAccount(true)
+                }}
+              >
+                Set withdrawal account
+              </Button>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowWithdraw(false)}>
+              Cancel
+            </Button>
+            {wallet.withdrawalAccountNumber && (
+              <Button
+                onClick={handleWithdraw}
+                disabled={
+                  requestingWithdrawal ||
+                  !withdrawAmount ||
+                  parseFloat(withdrawAmount) < 1000
+                }
+              >
+                {requestingWithdrawal && (
+                  <IconLoader2 className="size-4 animate-spin" />
+                )}
+                Request withdrawal
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

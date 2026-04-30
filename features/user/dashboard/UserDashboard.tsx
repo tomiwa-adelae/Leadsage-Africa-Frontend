@@ -398,39 +398,6 @@ export function UserDashboard() {
         }
       />
 
-      {/* Stat cards */}
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={IconBookmark}
-          label="Saved Listings"
-          value={stats?.saved ?? 0}
-          href="/saved"
-          loading={loading}
-        />
-        <StatCard
-          icon={IconClipboardList}
-          label="Applications"
-          value={stats?.applications ?? 0}
-          href="/applications"
-          loading={loading}
-        />
-        <StatCard
-          icon={IconCalendar}
-          label="Bookings"
-          value={stats?.bookings ?? 0}
-          href="/bookings"
-          loading={loading}
-        />
-        <StatCard
-          icon={IconBell}
-          label="Unread Notifications"
-          value={stats?.unreadNotifications ?? 0}
-          href="/notifications"
-          loading={loading}
-          accent={stats?.unreadNotifications ? "bg-red-500" : undefined}
-        />
-      </div>
-
       {/* Wallet + Savings + Interest */}
       <div className="grid gap-3 sm:grid-cols-3">
         <Link href="/wallet">
@@ -608,6 +575,39 @@ export function UserDashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Stat cards */}
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          icon={IconBookmark}
+          label="Saved Listings"
+          value={stats?.saved ?? 0}
+          href="/saved"
+          loading={loading}
+        />
+        <StatCard
+          icon={IconClipboardList}
+          label="Applications"
+          value={stats?.applications ?? 0}
+          href="/applications"
+          loading={loading}
+        />
+        <StatCard
+          icon={IconCalendar}
+          label="Bookings"
+          value={stats?.bookings ?? 0}
+          href="/bookings"
+          loading={loading}
+        />
+        <StatCard
+          icon={IconBell}
+          label="Unread Notifications"
+          value={stats?.unreadNotifications ?? 0}
+          href="/notifications"
+          loading={loading}
+          accent={stats?.unreadNotifications ? "bg-red-500" : undefined}
+        />
+      </div>
 
       {/* Recent Applications + Recent Bookings */}
       <div className="grid gap-4 lg:grid-cols-2">

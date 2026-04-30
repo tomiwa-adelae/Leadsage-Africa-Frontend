@@ -224,7 +224,7 @@ export function FirstKeyPage() {
         title="FirstKey Savings"
         description="Save toward your next home with 12% annual interest"
         action={
-          <Button asChild size="sm">
+          <Button className="hidden" asChild size="sm">
             <Link href="/firstkey/new">
               <IconPlus className="size-4" />
               New Plan
